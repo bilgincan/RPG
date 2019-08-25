@@ -65,6 +65,10 @@ public abstract class Character{
         }
     }
 
+    public double[] getAbilities(){
+        return this.effectiveAbilities;
+    }
+
     //setters
     public void setSanity(int sanity){
         this.sanity = sanity;
@@ -78,11 +82,16 @@ public abstract class Character{
         this.money = money;
     }
 
+    public void setAbilities(double[] ab){
+        for(int i = 0; i < ab.length; i++){
+            this.effectiveAbilities[i] = ab[i];
+        }
+    }
+
     //functions depends on rolling dice
     // b == true close attack b == false wideAttack
     public double attack(boolean b){
         rollDice();
-        System.out.println("Zar atıldı gelen sayı: "+this.dice);
         if(b){
             return effectiveAbilities[0]*dice;
         }
@@ -92,23 +101,23 @@ public abstract class Character{
     //attackpoints is the damage of the attacking character
     public double defence(double attackpoints){
         rollDice();
-        System.out.println("Saldırıyı savuşturmak için zar atıldı, gelen sayı: "+this.dice);
+        // System.out.println("Saldırıyı savuşturmak için zar atıldı, gelen sayı: "+this.dice);
         int dodged = (int) this.dodgeAttack();
         if(dodged > 50){
-            System.out.println("Saldırı savuşturuldu / The attack has been dodged");
+            System.out.println("Saldırı savuşturuldu");
             return 0;
         }
         rollDice();
-        System.out.println("Savunma için zar atıldı gelen sayı: "+this.dice);
+        //System.out.println("Savunma için zar atıldı gelen sayı: "+this.dice);
         double defence = attackpoints - (effectiveAbilities[2]*dice/2);
         if(defence <= 0){
-            System.out.println("Saldırı savunuldu / The attack has been well defended");
+            System.out.println("Saldırıdan hiç hasar almadan çıkıldı.");
             return 0;
         }
         else{
             this.health = this.health - (int) defence;
             if(this.health < 0)
-                System.out.println("Maalesef bu karakter öldü.");
+                System.out.println(this.CharacterName+" öldü.");
             return defence;
         }
     }
@@ -120,7 +129,7 @@ public abstract class Character{
 
     public double investigate(){
         rollDice();
-        System.out.println("Zar atıldı gelen sayı: "+this.dice);
+        //System.out.println("Zar atıldı gelen sayı: "+this.dice);
         return effectiveAbilities[6]*dice;
     }
 
@@ -138,7 +147,7 @@ public abstract class Character{
 
     public double convince(){
         rollDice();
-        System.out.println("Zar atıldı gelen sayı: "+this.dice);
+        //System.out.println("Zar atıldı gelen sayı: "+this.dice);
         return effectiveAbilities[5]*dice;
     }
 
@@ -150,7 +159,7 @@ public abstract class Character{
         }else{
             this.money = this.money - item.getPrice();
             items.add(item);
-            System.out.println("Satın alma işlemi başarı ile gerçekleştirilmiştir / The purchase action has been accomplished");
+            System.out.println("Satın alma işlemi başarı ile gerçekleştirilmiştir");
         }
     }
 

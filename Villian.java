@@ -28,17 +28,17 @@ public class Villian{
 
     private void intansiateCharacter(String character){
         switch(character){
-            case "Wizard": this.character = new Wizard(null,null);
+            case "Wizard": this.character = new Wizard("Düşman",null);
             break;
-            case "Farmer": this.character = new Farmer(null,null);
+            case "Farmer": this.character = new Farmer("Düşman",null);
             break;
-            case "Knight": this.character = new Knight(null,null);
+            case "Knight": this.character = new Knight("Düşman",null);
             break;
-            case "BlackSmith": this.character = new BlackSmith(null, null);
+            case "BlackSmith": this.character = new BlackSmith("Düşman", null);
             break;
-            case "Barbarian": this.character = new Barbarian(null, null);
+            case "Barbarian": this.character = new Barbarian("Düşman", null);
             break;
-            case "Wolfman": this.character = new Wolfman(null,null);
+            case "Wolfman": this.character = new Wolfman("Düşman",null);
             break;
             case "Boss": this.character = new Boss();
             break;
@@ -49,11 +49,15 @@ public class Villian{
 
     public void closeAttack(Character target){
         double attackpoints = this.character.attack(true);
+        System.out.println("Düşman "+attackpoints+" vuruş yaptı.");
         target.defence(attackpoints);
+        System.out.println(target.getCharacterName()+"ın "+target.getHealth()+" canı kaldı.");
     }
 
     public void wideAttack(Character target){
         double attackpoints = this.character.attack(false);
+        System.out.println("Düşman "+attackpoints+" vuruş yaptı.");
         target.defence(attackpoints);
+        System.out.println(target.getCharacterName()+"ın "+target.getHealth()+" canı kaldı.");
     }
 }

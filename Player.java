@@ -63,12 +63,16 @@ public class Player{
 
     public void closeAttack(Character target){
         double attackpoints = this.character.attack(true);
+        System.out.println(this.character.getCharacterName()+" "+attackpoints+" vuruş yaptı");
         target.defence(attackpoints);
+        System.out.println(target.getCharacterName()+"ın "+target.getHealth()+" canı kaldı.");
     }
 
     public void wideAttack(Character target){
         double attackpoints = this.character.attack(false);
+        System.out.println(this.character.getCharacterName()+" "+attackpoints+" vuruş yaptı");
         target.defence(attackpoints);
+        System.out.println(target.getCharacterName()+"ın "+target.getHealth()+" canı kaldı.");
     }
 
     public double investiage(){
@@ -79,7 +83,7 @@ public class Player{
         return this.character.sneak();
     }
 
-    public int rollDice(){
+    public static int rollDice(){
         return (int) (Math.random()*10+1);
     }
 
