@@ -31,4 +31,19 @@ public class Admin{
         player.getCharacter().setAbilities(abilities);
     }
 
+    public int rollDice(){
+        return Player.rollDice();
+    }
+
+    public void generateEnemy(String type){
+        Villian enemy = new Villian(type);
+        villians.add(enemy);
+        enemy.setAdmin(this);
+    }
+
+    public void generatePlayer(String playerName,String characterName,String character){
+        Player player = new Player(playerName, characterName, character);
+        players.add(player);
+        player.setAdmin(this);
+    }
 }

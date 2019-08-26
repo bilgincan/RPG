@@ -1,9 +1,18 @@
 public class Villian{
     private Character character;
+    private Admin admin;
 
 
     public Villian(String charactertype){
         intansiateCharacter(charactertype);
+    }
+
+    public void setAdmin(Admin admin){
+        this.admin = admin;
+    }
+
+    public Admin getAdmin(){
+        return this.admin;
     }
 
     public Character getCharacter(){

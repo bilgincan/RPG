@@ -4,10 +4,19 @@ public class Player{
     private Character character;
     private String playerName;
     private List<Character> Enemies;
+    private Admin admin;
 
     public Player(String playerName,String characterName, String character){
         intansiateCharacter(character,characterName);
         this.playerName = playerName;
+    }
+
+    public void setAdmin(Admin admin){
+        this.admin = admin;
+    }
+
+    public Admin getAdmin(){
+        return this.admin;
     }
 
     public String getPlayerName(){
