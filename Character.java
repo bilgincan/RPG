@@ -157,7 +157,16 @@ public abstract class Character{
         if(item.getPrice() > money){
             System.out.println("Bu itemi satın almaya paranız yetmiyor / You can't buy this item, because you don't have enough money");
         }else{
-            this.money = this.money - item.getPrice();
+            //farmer gets products with 10% discount
+            if(this instanceof Farmer){
+                //convert int money into double
+                double m =item.getPrice();
+                int a =(int) (m * (0.9));
+                this.money = this.money - a;
+            }
+            else
+                this.money = this.money - item.getPrice();
+
             items.add(item);
             System.out.println("Satın alma işlemi başarı ile gerçekleştirilmiştir");
         }

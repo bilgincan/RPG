@@ -4,17 +4,39 @@
     <title>Oyun</title>
 </head>
 <body>
-    <h1>Merhaba Hoşgeldiniz</h1>
-    <h2>Oyuna başlamak için lütfen bir karakter seçiniz</h2>
-    <input type="checkbox" id="wizard">büyücü
-    <input type="checkbox" id="farmer">çiftçi
-    <input type="checkbox" id="knight">şovalye
-    <input type="checkbox" id="blacksmith">demirci
-    <input type="checkbox" id="barbarian">barbar
-    <input type="checkbox" id="wolfman">kurt adam
-     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <h1 align="center">Merhaba Hoşgeldiniz</h1>
+    <h2 align="center">Oyuna başlamak için lütfen bir karakter seçiniz</h2>
+
+    <form action="/initializeCharacters">
+        <input class="checkboxes" type="checkbox" name="character" value="wizard">büyücü
+        <input class="checkboxes" type="checkbox" name="character" value="farmer">çiftçi
+        <input class="checkboxes" type="checkbox" name="character" value="knight">şovalye
+        <input class="checkboxes" type="checkbox" name="character" value="blacksmith">demirci
+        <input class="checkboxes" type="checkbox" name="character" value="barbarian">barbar
+        <input class="checkboxes" type="checkbox" name="character" value="wolfman">kurt adam <br><br>
+        İsminizi giriniz<input class="name" name="playerName"><br><br>
+        Karakterin ismini girin<input class="name" name="characterName"><br><br>
+        <button type="submit" id="characterSubmit">karakteri seç</button>
+    </form>
+
+     <script src="jquery-3.2.1.js"></script>
      <script>
+        //css codes
         $("h2").css("color","orange")
+        $(".checkboxes").prop("checked",false)
+        $("form").css({"position":"absolute","left":"35%"})
+        $("#characterSubmit").css({"position":"absolute","left":"40%"})
+        $(".name").css({"position":"absolute","left":"50%"})
+
+        //only one check box must be checkedS
+        var checked = 0;
+        $(".checkboxes").click(function(){
+            checked++
+            if(checked > 1){
+                $(".checkboxes").prop("checked",false)
+                $(this).prop("checked",true)
+            }
+        })
      </script>
 </body>
 </html>
