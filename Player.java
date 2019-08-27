@@ -104,6 +104,10 @@ public class Player{
         return this.character.convince();
     }
 
+    public String toString(){
+        return this.playerName;
+    }
+
 
 
 }

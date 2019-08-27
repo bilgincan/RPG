@@ -4,6 +4,11 @@ public class Admin{
     private List<Player> players;
     private List<Villian> villians;
 
+    public Admin(){
+        this.players = new ArrayList<Player>();
+        this.villians = new ArrayList<Villian>();
+    }
+
     public List<Player> getPlayers(){
         return this.players;
     }
@@ -45,5 +50,11 @@ public class Admin{
         Player player = new Player(playerName, characterName, character);
         players.add(player);
         player.setAdmin(this);
+    }
+
+    //resets characters and villians
+    public void resetStory(){
+        this.players = new ArrayList<Player>();
+        this.villians = new ArrayList<Villian>();
     }
 }

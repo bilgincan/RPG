@@ -8,16 +8,17 @@
     <h2 align="center">Oyuna başlamak için lütfen bir karakter seçiniz</h2>
 
     <form action="/initializeCharacters">
-        <input class="checkboxes" type="checkbox" name="character" value="wizard">büyücü
-        <input class="checkboxes" type="checkbox" name="character" value="farmer">çiftçi
-        <input class="checkboxes" type="checkbox" name="character" value="knight">şovalye
-        <input class="checkboxes" type="checkbox" name="character" value="blacksmith">demirci
-        <input class="checkboxes" type="checkbox" name="character" value="barbarian">barbar
-        <input class="checkboxes" type="checkbox" name="character" value="wolfman">kurt adam <br><br>
+        <input class="checkboxes" type="checkbox" name="character" value="Wizard">büyücü
+        <input class="checkboxes" type="checkbox" name="character" value="Farmer">çiftçi
+        <input class="checkboxes" type="checkbox" name="character" value="Knight">şovalye
+        <input class="checkboxes" type="checkbox" name="character" value="BlackSmith">demirci
+        <input class="checkboxes" type="checkbox" name="character" value="Barbarian">barbar
+        <input class="checkboxes" type="checkbox" name="character" value="Wolfman">kurt adam <br><br>
         İsminizi giriniz<input class="name" name="playerName"><br><br>
         Karakterin ismini girin<input class="name" name="characterName"><br><br>
         <button type="submit" id="characterSubmit">karakteri seç</button>
     </form>
+    <button id="character_infos">Karakterleri Oku</button>
 
      <script src="jquery-3.2.1.js"></script>
      <script>
@@ -36,6 +37,11 @@
                 $(".checkboxes").prop("checked",false)
                 $(this).prop("checked",true)
             }
+        })
+
+        $("#character_infos").click(function(){
+            $.post("karakter");
+            window.open("../htmlCodes/characters.html")
         })
      </script>
 </body>
