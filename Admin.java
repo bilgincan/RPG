@@ -46,10 +46,18 @@ public class Admin{
         enemy.setAdmin(this);
     }
 
-    public void generatePlayer(String playerName,String characterName,String character){
+    public boolean generatePlayer(String playerName,String characterName,String character){
+        for(Player p: players){
+            if(p.getCharacter().getCharacterName().equals(characterName))
+                return  false;
+            if(p.getPlayerName().equals(playerName))
+                return  false;
+        }
         Player player = new Player(playerName, characterName, character);
         players.add(player);
         player.setAdmin(this);
+        return true;
+
     }
 
     //resets characters and villians

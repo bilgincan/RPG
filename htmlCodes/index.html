@@ -20,7 +20,7 @@
     </form>
     <button id="character_infos">Karakterleri Oku</button>
 
-     <script src="jquery-3.2.1.js"></script>
+     <script src="../htmlCodes/jquery-3.2.1.js"></script>
      <script>
         //css codes
         $("h2").css("color","orange")
@@ -28,6 +28,7 @@
         $("form").css({"position":"absolute","left":"35%"})
         $("#characterSubmit").css({"position":"absolute","left":"40%"})
         $(".name").css({"position":"absolute","left":"50%"})
+        $("#character_infos").css({"position":"absolute","left":"45%","top":"30%"})
 
         //only one check box must be checkedS
         var checked = 0;
@@ -40,7 +41,6 @@
         })
 
         $("#character_infos").click(function(){
-            $.post("karakter");
             window.open("../htmlCodes/characters.html")
         })
      </script>

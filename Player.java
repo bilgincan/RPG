@@ -3,7 +3,6 @@ import java.util.*;
 public class Player{
     private Character character;
     private String playerName;
-    private List<Character> Enemies;
     private Admin admin;
 
     public Player(String playerName,String characterName, String character){
@@ -44,14 +43,6 @@ public class Player{
             default: System.out.println("Algılanamadı");
             break;
         }
-    }
-
-    public String enemiesToString(){
-        String enemies = "";
-        for(Character i: Enemies){
-            enemies += i.getCharacterName()+"\n";
-        }
-        return enemies;
     }
 
     public void purchase(Item item){

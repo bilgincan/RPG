@@ -4,17 +4,15 @@ import java.util.*;
 
 public class GameServer{
     private final ServerSocket server;
-    private static final String index_page = "../htmlCodes/index.html";
-    private String currentScreen;
-    private static final String jquery = "../htmlCodes/jquery-3.2.1.js";
-    private static final String characterInfos = "../htmlCodes/characters.html";
+    private static final String homePage = "../htmlCodes/index.html";
+    private static final String player_page = "../htmlCodes/player.html";
     private Admin admin;
     private List<Player> players;
     private List<Villian> villians;
+    private Socket socket;
 
     public GameServer(int port) throws IOException{
         server = new ServerSocket(port);
-        currentScreen = index_page;
 
         //you must delete this line after tests
         initializeAdmin();
@@ -42,67 +40,34 @@ public class GameServer{
     }
 
     private void systemon(java.net.Socket socket){
+        this.socket = socket;
 
         try{
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintStream out = new PrintStream(socket.getOutputStream());
 
-            BufferedReader htmlCode = new BufferedReader(new FileReader(currentScreen));
-
-            //content is the content of the html file
-            String content = "";
-
-            while( htmlCode.ready()){
-                content += htmlCode.readLine();
-                content += "\n";
-            }
-
-            htmlCode.close();
             //for getting inputs from the user
             String input = in.readLine();
             System.out.println(input);
 
-            //loads character info screen
-            if(input.equals("GET /htmlCodes/characters.html HTTP/1.1")){
-                BufferedReader characters = new BufferedReader(new FileReader(characterInfos));
+            if(input.equals("GET / HTTP/1.1")){
+            printHTMLPage(homePage);
+        }
 
-                String charactersContent = "";
+            //load html files by names
+            if(input.contains("GET /htmlCodes/")){
+                String[] parts = input.split("/");
+                String file = parts[2];
+                parts = file.split(" ");
+                file = "../htmlCodes/";
+                file += parts[0];
 
-                while(characters.ready()){
-                    charactersContent += characters.readLine();
-                    charactersContent += "\n";
-                }
-                characters.close();
-
-                out.println("HTTP/1.1 \nContent-Type: text/html\n\r\n");
-                out.println(charactersContent);
-                out.flush();
-            }
-            //loads jquery
-            else if(input.equals("GET /jquery-3.2.1.js HTTP/1.1")){
-                BufferedReader jqueryCode = new BufferedReader(new FileReader(jquery));
-
-                String jquerycontent = "";
-
-                while(jqueryCode.ready()){
-                    jquerycontent += jqueryCode.readLine();
-                    jquerycontent += "\n";
-                }
-                jqueryCode.close();
-
-                out.println(jquerycontent);
-                out.flush();
-
-            }
-            else{
-                out.println("HTTP/1.1 \nContent-Type: text/html\n\r\n");
-                out.println(content);
-                out.flush();
+                printHTMLPage(file);
             }
 
 
             //extract the input
-            if(this.admin != null && input.contains("GET /initializeCharacters?character=")){
+            if(this.admin != null && input.contains("GET /initializeCharacters?")){
                 String[] parts = input.split("character=");
                 String neccessarypart = parts[1];
                 parts = neccessarypart.split("&");
@@ -118,8 +83,13 @@ public class GameServer{
                 parts = characterName.split(" HTTP");
                 characterName = parts[0];
 
-                //neccessarypart is in that case the type of the character
-                initializePlayer(playerName,characterName,character);
+                //if the character can be initiazed load the character page
+                if(initializePlayer(playerName,characterName,character))
+                    printHTMLPage(player_page);
+                else{
+                    printHTMLPage(homePage);
+                    alert();
+                }
             }
 
             System.out.println(this.admin.getPlayers().toString());
@@ -128,18 +98,58 @@ public class GameServer{
             e.printStackTrace();
         }catch(Exception e){
             e.printStackTrace();
+            printHTMLPage(homePage);
+            alert();
         }
         }
 
         //for initializing players from the query
-    private void initializePlayer(String playerName, String characterName,String character){
-        this.admin.generatePlayer(playerName, characterName, character);
+    private boolean initializePlayer(String playerName, String characterName,String character){
+        if(playerName.equals("") || character.equals("") || characterName.equals("") || characterName == null){
+            return false;
+        }
+        else{
+            return this.admin.generatePlayer(playerName, characterName, character);
+        }
     }
 
     private void initializeAdmin(){
         this.admin = new Admin();
         players = this.admin.getPlayers();
         villians = this.admin.getVillians();
+    }
+
+    private void printHTMLPage(String page){
+        try{
+
+        PrintStream out = new PrintStream(socket.getOutputStream());
+        BufferedReader htmlCode = new BufferedReader(new FileReader(page));
+
+        //content is the content of the html file
+        String content = "";
+
+        while( htmlCode.ready()){
+            content += htmlCode.readLine();
+            content += "\n";
+        }
+
+        htmlCode.close();
+
+        out.println("HTTP/1.1 \nContent-Type: text/html\n\r\n");
+        out.println(content);
+        out.flush();
+    }catch(Exception e){
+        e.printStackTrace();
+    }
+}
+    private void alert(){
+        try{
+            PrintStream out = new PrintStream(socket.getOutputStream());
+            out.println("<script>window.alert('Lütfen karakterin tipi seçiniz, karakterin ismini yazınız ve kendi isminizi yazınız. Not: karakterinin ismi başka bir karakterle aynı ismi taşıyorsa da bu mesajı alıyor olabilirsin.')</script>");
+            out.flush();
+        }catch(IOException ex){
+            ex.printStackTrace();
+        }
     }
     public static void main(String[] a) throws IOException{
         GameServer server = new GameServer(8080);
