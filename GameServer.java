@@ -171,6 +171,28 @@ public class GameServer{
                     jsCode += " , ";
             }
             jsCode += "];";
+
+            jsCode += "var items = [";
+            List<Item> items = charprint.getItems();
+            for(int i = 0; i< items.size(); i++){
+                Item item = items.get(i);
+                if(item instanceof Weapon){
+                    jsCode += "['Weapon','"+item.getClass()+"']";
+                }
+                else if(item instanceof Shoe){
+                    jsCode += "['Shoe','"+item.getClass()+"']";
+                }
+                else if(item instanceof Armor){
+                    jsCode += "['Armor','"+item.getClass()+"']";
+                }
+                else if(item instanceof Wizardish){
+                    jsCode += "['Wizardish','"+item.getClass()+"']";
+                }
+                if(i < items.size()-1){
+                    jsCode += " , ";
+                }
+            }
+            jsCode += "];";
             printHTMLPage(player_page,jsCode);
         }
     }
