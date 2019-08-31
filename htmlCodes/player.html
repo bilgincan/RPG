@@ -38,11 +38,42 @@
     </font>
     </ul>
 
+    <div class='items'>
+        <h2 class='item_sec' id='items_title'>Eşyalar:</h2>
+        <ul id='item_list'>
+        </ul>
+        <h2 class='item_sec' id='market_place'>Market:</h2>
+        <div class='products'>
+        <div id='weapons'>
+            <h3>Silahlar:</h3>
+            <ul id="weaponary">
+            </ul>
+        </div>
+        <div id='armors'>
+            <h3>Zırhlar:</h3>
+            <ul id="armory">
+            </ul>
+        </div>
+        <div id='shoes'>
+            <h3>Ayakkabılar:</h3>
+            <ul id="shoery">
+            </ul>
+        </div>
+        <div id='wizardish'>
+            <h3>Büyü Arttırıcı:</h3>
+            <ul id="wizardian">
+            </ul>
+        </div>
+    </div>
+
+
+    </div>
+
 
     <script src="/htmlCodes/jquery-3.2.1.js"></script>
     <script>
 
-    //character abilities etc.
+    //character abilities etc. datas
     var characterName;
     var abilities;
     var characterType;
@@ -51,65 +82,117 @@
     var health;
     var sanity;
 
-
+    //arrays of items
+    var weaponary = [["kısa kılıç","+0,5 atak",50,"ShortSword"],["uzun kılıç","+1,5 atak",125,"LongSword"],["normal balta","+0,5 atak",50,"OrdinaryAxe"],["oduncu baltası","+0,25 atak",20,"LumberjackAxe"],["savaş baltası","+1 atak",100,"BattleAxe"],["ok","+0,5 uzak mesafe atak",50,"Bow"],["arbalet","+1 uzak mesafe atak",150,"CrossBow"]]
+    var armory = [["hafif zırh","+0,25 defans +1 savuşturma +2 hız","",50,"LightArmor"],["orta zırh","+0,5 defans +1 savuşturma +1 hız","",100,"MediumArmor"],["ağır zırh","+2 defans","-1 savuşturma -0,5 hız",150,"HeavyArmor"],["tank zırhı","+5 defans","-3 savuşturma -2 hız",150,"TankArmor"]]
+    var shoery = [["çarık","+0,5 hız +0,5 savuşturma","",15,"Sandal"],["hafif ayakkabı","+1 hız +1 savuşturma","",30,"LightShoe"],["hafif spor ayakabbı","+1,5 hız +2 savuşturma","",75,"SportShoe"],["hafif zırhlı","+0,2 defans +0,5 hız +1 savuşturma","",50,"LightArmoredShoe"],["orta zırhlı","+0,5 defans +0,2 hız +0,5 savuşturma","",55,"MediumArmoredShoe"],["ağır zırhlı","+1 defans","",60,"HeavyShoe"]]
+    var wizardian = [["asa","+1 iyileştirme","",100,"Wand"],["karizmatik gözlük","+1 ikna","",70,"Sunglasses"],["büyücü pelerini","+0,5 iyileştirme +0,5 ikna +0,5 araştırma +0,5 gizlenme","",125,"Cloak"]]
     //for the sake of the server
     window.history.pushState("oyuncu","Oyuncu","http://localhost:8080/htmlCodes/player.html/current="+characterName)
 
+
+    printValues()
+    printMarket()
+
+
+    //css codes
     $("#values_section").css({"position":"absolute","right":"15%","top":"0%"})
-    $("#enemies").css({"position":"absolute","left":"40%","top":"0%","color":"red"})
-    $(".abilities").css({"position":"absolute","top":"20%"})
+    $("#enemies").css({"position":"absolute","left":"25%","top":"0%","color":"red"})
+    $(".abilities").css({"position":"absolute","top":"15%","background-color":"orange"})
     $("#money").css({"color":"gold"})
     $("#health").css("color","green")
     $("#sanity").css("color","powderblue")
+    $(".items").css({"position":"absolute","left":"40%","top":"23%","background-color":"#329ba8","width":"60%","height":"100%"})
+    $(".item_sec").css("color","#aaf542")
+    $("#armors").css({"position":"absolute","top":"15%","left":"55%","width":"30%"})
+    $("#weapons").css({"position":"absolute","top":"15%","left":"0%"})
+    $("#shoes").css({"position":"absolute","top":"50%","left":"0%","width":"35%"})
+    $("#wizardish").css({"position":"absolute","top":"50%","left":"55%","width":"30%"})
+    $("seg#adds").css("color","#9ef542")
+    $("seg#price").css("color","yellow")
+    $("seg#negs").css("color","#c43408")
+    $(".purchase").css({"position":"absolute","left":"105%","height":"10%","width":"35%","color":"#ed1515","background-color":"#edebcc"})
+
+    $(".purchase").mouseenter(function(){
+        $(this).css("cursor","grab")
+    })
+    $(".purchase").mouseleave(function(){
+        $(this).css("cursor","auto")
+    })
 
 
-    for(var i = 0; i < abilities.length ; i++){
-        $("#"+i).append("<b>"+abilities[i]+"</b>")
-    }
-
-    $("#character_name").append(" "+characterName)
-    $("#money").append(" "+money)
-    $("#health").append(" "+health)
-    $("#sanity").append(" "+sanity)
-    //for printing character type
-    switch(characterType){
-        case "class Knight": $("#character_type").append(" şovalye")
-        break
-        case "class Wizard": $("#character_type").append(" büyücü")
-        break
-        case "class Farmer": $("#character_type").append(" çiftçi")
-        break
-        case "class BlackSmith": $("#character_type").append(" demirci")
-        break
-        case "class Barbarian": $("#character_type").append(" barbar")
-        break
-        case "class Wolfman": $("#character_type").append(" kurt adam")
-        break
-    }
-
-    for(var i = 0; i < enemies.length; i++){
-        var enemyName = enemies[i][0]
-        switch(enemyName){
-            case "class Knight": $("#enemy_list").append("<li>Şovalye  ")
+    function printValues(){
+        for(var i = 0; i < abilities.length ; i++){
+            $("#"+i).append("<b>"+abilities[i]+"</b>")
+        }
+        $("#character_name").append(" "+characterName)
+        $("#money").append(" "+money)
+        $("#health").append(" "+health)
+        $("#sanity").append(" "+sanity)
+        //for printing character type
+        switch(characterType){
+            case "class Knight": $("#character_type").append(" şovalye")
             break
-            case "class Wizard": $("#enemy_list").append("<li>Büyücü  ")
+            case "class Wizard": $("#character_type").append(" büyücü")
             break
-            case "class Farmer": $("#enemy_list").append("<li>Çiftçi  ")
+            case "class Farmer": $("#character_type").append(" çiftçi")
             break
-            case "class BlackSmith": $("#enemy_list").append("<li>Demirci  ")
+            case "class BlackSmith": $("#character_type").append(" demirci")
             break
-            case "class Barbarian": $("#enemy_list").append("<li>Barbar  ")
+            case "class Barbarian": $("#character_type").append(" barbar")
             break
-            case "class Wolfman": $("#enemy_list").append("<li>Kurt adam  ")
-            break
-            case "class Boss": $("#enemy_list").append("<li>Boss  ")
+            case "class Wolfman": $("#character_type").append(" kurt adam")
             break
         }
 
-        var enemyHealth = enemies[i][1]
-        $("#enemy_list").append(enemyHealth+"</li>")
+        for(var i = 0; i < enemies.length; i++){
+            var enemyName = enemies[i][0]
+            switch(enemyName){
+                case "class Knight": $("#enemy_list").append("<li>Şovalye  ")
+                break
+                case "class Wizard": $("#enemy_list").append("<li>Büyücü  ")
+                break
+                case "class Farmer": $("#enemy_list").append("<li>Çiftçi  ")
+                break
+                case "class BlackSmith": $("#enemy_list").append("<li>Demirci  ")
+                break
+                case "class Barbarian": $("#enemy_list").append("<li>Barbar  ")
+                break
+                case "class Wolfman": $("#enemy_list").append("<li>Kurt adam  ")
+                break
+                case "class Boss": $("#enemy_list").append("<li>Boss  ")
+                break
+            }
+
+            var enemyHealth = enemies[i][1]
+            $("#enemy_list").append(enemyHealth+"</li>")
+
+        }
 
     }
+
+
+
+
+    function printMarket(){
+        //weaponary
+        for(var i = 0; i < weaponary.length;i++){
+            $("#weaponary").append("<li style='color:$404040'>"+weaponary[i][0]+"    <seg id='adds'> "+weaponary[i][1]+"    <seg id='price'> //"+weaponary[i][2]+"<button class='purchase' id='"+weaponary[i][3]+"'>Satın al</button></li><br>")
+        }
+
+        for(var i = 0; i < armory.length; i++){
+            $("#armory").append("<li style='color:$404040'>"+ armory[i][0]+"    <seg id='adds'> "+armory[i][1]+"    <seg id='negs'> "+armory[i][2]+"    <seg id='price'> //"+armory[i][3]+"<button class='purchase' id='"+armory[i][4]+"'>Satın al</button></li><br>")
+        }
+
+        for(var i = 0; i < shoery.length; i++){
+            $("#shoery").append("<li style='color:$404040'>"+ shoery[i][0]+"    <seg id='adds'> "+shoery[i][1]+"    <seg id='negs'> "+shoery[i][2]+"    <seg id='price'> //"+shoery[i][3]+"<button class='purchase' id='"+shoery[i][4]+"'>Satın al</button></li><br>")
+        }
+
+        for(var i = 0; i < wizardian.length; i++){
+            $("#wizardian").append("<li style='color:$404040'>"+ wizardian[i][0]+"    <seg id='adds'> "+wizardian[i][1]+"    <seg id='negs'> "+wizardian[i][2]+"    <seg id='price'> //"+wizardian[i][3]+"<button class='purchase' id='"+wizardian[i][4]+"'>Satın al</button></li><br>")
+        }
+    }
+
 
     </script>
 </body>
