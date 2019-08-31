@@ -9,7 +9,7 @@ public abstract class Character{
     protected List<Item> items;
     private List<Item> wornItems;
     protected int dice;
-    public double[] effectiveAbilities;
+    private double[] effectiveAbilities;
 
     protected void rollDice(){
         this.dice = (int) (Math.random() * 10+1);
@@ -38,6 +38,10 @@ public abstract class Character{
     }
 
     //getters
+    public double[] getEffectiveAbilities(){
+        return this.effectiveAbilities;
+    }
+    
     public int getMoney(){
         return this.money;
     }

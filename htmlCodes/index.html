@@ -7,6 +7,7 @@
     <h1 align="center">Merhaba Hoşgeldiniz</h1>
     <h2 align="center">Oyuna başlamak için lütfen bir karakter seçiniz</h2>
 
+    <div>
     <form action="/initializeCharacters">
         <input class="checkboxes" type="checkbox" name="character" value="Wizard">büyücü
         <input class="checkboxes" type="checkbox" name="character" value="Farmer">çiftçi
@@ -18,7 +19,8 @@
         Karakterin ismini girin<input class="name" name="characterName"><br><br>
         <button type="submit" id="characterSubmit">karakteri seç</button>
     </form>
-    <button id="character_infos">Karakterleri Oku</button>
+        <button id="character_infos">Karakterleri Oku</button>
+    </div>
 
      <script src="../htmlCodes/jquery-3.2.1.js"></script>
      <script>
@@ -28,7 +30,7 @@
         $("form").css({"position":"absolute","left":"35%"})
         $("#characterSubmit").css({"position":"absolute","left":"40%"})
         $(".name").css({"position":"absolute","left":"50%"})
-        $("#character_infos").css({"position":"absolute","left":"45%","top":"30%"})
+        $("#character_infos").css({"position":"absolute","left":"45%","top":"50%"})
 
         //only one check box must be checkedS
         var checked = 0;

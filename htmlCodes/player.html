@@ -4,5 +4,113 @@
     <title>Karakter Sayfası</title>
 </head>
 <body>
-    <h1>Karakter İsmi:</h1>
+    <div>
+        <h2 id="character_name">Karakter İsmi:</h2>
+    </div>
+
+    <div id="values_section">
+        <h2 id="money">Para:</h2>
+        <h2 id="health">Can:</h2>
+        <h2 id="sanity">Akıl sağlığı:</h2>
+    </div>
+
+    <div id="enemies">
+        <h2>Düşmanlar:</h2>
+        <font size="+2">
+        <ul id="enemy_list">
+        </ul>
+    </font>
+    </div>
+
+    <ul class="abilities">
+        <font size="+2">
+        <li id="character_type">karakter türü:</li><br>
+        <li>Yetenekler:</li><br>
+        <ol id=0>atak(yakın):</ol><br>
+        <ol id=1>atak(uzak):</ol><br>
+        <ol id=2>defans:</ol><br>
+        <ol id=3>hız:</ol><br>
+        <ol id=4>kaçınma (dodge):</ol><br>
+        <ol id=5>ikna:</ol><br>
+        <ol id=6>araştırma:</ol><br>
+        <ol id=7>gizlenme:</ol><br>
+        <ol id=8>tedavi etme:</ol><br>
+    </font>
+    </ul>
+
+
+    <script src="/htmlCodes/jquery-3.2.1.js"></script>
+    <script>
+
+    //character abilities etc.
+    var characterName;
+    var abilities;
+    var characterType;
+    var money;
+    var enemies;
+    var health;
+    var sanity;
+
+
+    //for the sake of the server
+    window.history.pushState("oyuncu","Oyuncu","http://localhost:8080/htmlCodes/player.html/current="+characterName)
+
+    $("#values_section").css({"position":"absolute","right":"15%","top":"0%"})
+    $("#enemies").css({"position":"absolute","left":"40%","top":"0%","color":"red"})
+    $(".abilities").css({"position":"absolute","top":"20%"})
+    $("#money").css({"color":"gold"})
+    $("#health").css("color","green")
+    $("#sanity").css("color","powderblue")
+
+
+    for(var i = 0; i < abilities.length ; i++){
+        $("#"+i).append("<b>"+abilities[i]+"</b>")
+    }
+
+    $("#character_name").append(" "+characterName)
+    $("#money").append(" "+money)
+    $("#health").append(" "+health)
+    $("#sanity").append(" "+sanity)
+    //for printing character type
+    switch(characterType){
+        case "class Knight": $("#character_type").append(" şovalye")
+        break
+        case "class Wizard": $("#character_type").append(" büyücü")
+        break
+        case "class Farmer": $("#character_type").append(" çiftçi")
+        break
+        case "class BlackSmith": $("#character_type").append(" demirci")
+        break
+        case "class Barbarian": $("#character_type").append(" barbar")
+        break
+        case "class Wolfman": $("#character_type").append(" kurt adam")
+        break
+    }
+
+    for(var i = 0; i < enemies.length; i++){
+        var enemyName = enemies[i][0]
+        switch(enemyName){
+            case "class Knight": $("#enemy_list").append("<li>Şovalye  ")
+            break
+            case "class Wizard": $("#enemy_list").append("<li>Büyücü  ")
+            break
+            case "class Farmer": $("#enemy_list").append("<li>Çiftçi  ")
+            break
+            case "class BlackSmith": $("#enemy_list").append("<li>Demirci  ")
+            break
+            case "class Barbarian": $("#enemy_list").append("<li>Barbar  ")
+            break
+            case "class Wolfman": $("#enemy_list").append("<li>Kurt adam  ")
+            break
+            case "class Boss": $("#enemy_list").append("<li>Boss  ")
+            break
+        }
+
+        var enemyHealth = enemies[i][1]
+        $("#enemy_list").append(enemyHealth+"</li>")
+
+    }
+
+    </script>
 </body>
+</html>
