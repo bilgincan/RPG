@@ -61,6 +61,11 @@ public class GameServer{
                 file = "../htmlCodes/";
                 file += parts[0];
 
+                if(!parts[0].contains("purchase")){
+                    parts = file.split("chase=");
+                    buyItem(parts[1]);
+                }
+
                 printHTMLPage(file);
             }
 
@@ -256,6 +261,31 @@ public class GameServer{
         e.printStackTrace();
     }
 }
+
+    private void buyItem(String itemName){
+        String[] parts = itemName.split(" ");
+        String item = parts[0];
+        String characterName = parts[1];
+
+        Character character = admin.getCharacterByName(characterName);
+        character.purchase(item);
+    }
+
+    private Item convertStringtoItem(String item){
+        switch(item){
+            case "ShortSword": return new ShortSword();
+            case "LongSword": return new LongSword();
+            case "OrdinaryAxe": return new OrdinaryAxe();
+            case "LumberjackAxe": return new LumberjackAxe();
+            case "BattleAxe": return new BattleAxe();
+            case "Bow": return new Bow();
+            case "CrossBow": return new CrossBow();
+            case "LightArmor": return new LigthArmor();
+            case "MediumArmor": return new MediumArmor();
+            case "HeavyArmor": return new HeavyArmor();
+            case "TankArmor": return new TankArmor();
+        }
+    }
     private void alert(){
         try{
             PrintStream out = new PrintStream(socket.getOutputStream());

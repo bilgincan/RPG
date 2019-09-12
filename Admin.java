@@ -17,6 +17,20 @@ public class Admin{
         return this.villians;
     }
 
+    public Player getPlayerByName(String name){
+        for(Player p : this.players){
+            if(p.getPlayerName().equals(name))
+                return p;
+        }
+    }
+
+    public Character getCharacterByName(String name){
+        for(Player p: this.players){
+            if(p.getCharacter().getCharacterName().equals(name))
+                return p.getCharacter();
+        }
+    }
+
     public void giveMoney(int plusMoney,Player player){
         Character a = player.getCharacter();
         a.setMoney(a.getMoney()+plusMoney);

@@ -231,6 +231,12 @@
         }
     }
 
+    $(".purchase").click(function(){
+        var id = $(this).attr('id')
+        window.alert(id)
+        $.post("purchase="+id+" "+characterName)
+    })
+
 
     </script>
 </body>
