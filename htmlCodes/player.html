@@ -99,7 +99,7 @@
 
     //css codes
     $("#values_section").css({"position":"absolute","right":"15%","top":"0%"})
-    $("#enemies").css({"position":"absolute","left":"25%","top":"7%","color":"red"})
+    $("#enemies").css({"position":"absolute","left":"20%","top":"7%","color":"red"})
     $(".abilities").css({"position":"absolute","top":"15%","background-color":"orange"})
     $("#money").css({"color":"gold"})
     $("#health").css("color","green")
@@ -107,8 +107,8 @@
     $(".items").css({"position":"absolute","left":"40%","top":"23%","background-color":"#329ba8","width":"60%","height":"150%"})
     $(".item_sec").css("color","#aaf542")
     $("#armors").css({"position":"absolute","top":"20%","left":"55%","width":"30%"})
-    $("#weapons").css({"position":"relative","top":"20%","left":"0%"})
-    $("#shoes").css({"position":"relative","top":"50%","left":"0%","width":"35%"})
+    $("#weapons").css({"position":"absolute","top":"20%","left":"0%"})
+    $("#shoes").css({"position":"absolute","top":"50%","left":"0%","width":"35%"})
     $("#wizardish").css({"position":"absolute","top":"50%","left":"55%","width":"30%"})
     $("seg#adds").css("color","#9ef542")
     $("seg#price").css("color","yellow")
@@ -167,7 +167,7 @@
             }
 
             var enemyHealth = enemies[i][1]
-            $("#enemy_list").append(enemyHealth+"</li>")
+            $("#enemy_list").append(enemyHealth+"<br><button id='"+enemyName+"' class='closeAttack'>Yakından saldır</button><button id='"+enemyName+"' class='wideAttack'>Uzaktan saldır</button></li>")
 
         }
 
@@ -175,35 +175,43 @@
 
 
     function printItemList(){
-        console.log(items)
+      console.log(items)
+        var item_action;
         for(var i = 0; i < items.length; i++){
+          //from server I receive if it is worn or not
+          if(items[i][2] == true){
+            item_action = "class='remove'>Eşyayı çıkar"
+          }else{
+            item_action = "class='wear'>Eşyayı giy"
+          }
             if(items[i][0] == "Weapon"){
                 for(var j = 0; j < weaponary.length; j++){
-                    if(items[i][1].includes(weaponary[j][3])){
-                       $("#item_list").append("<ol id='"+weaponary[j][3]+"'>"+weaponary[j][0]+"<button class='wear'>Eşyayı giy</button><button class='sell'>Eşyayı sat</ol>")
+                    if(items[i][1] == "class "+weaponary[j][3]){
+                      console.log(weaponary[j][3])
+                       $("#item_list").append("<ol>"+weaponary[j][0]+"<button id='"+weaponary[j][3]+"' "+item_action+"</button><button class='sell' id='"+weaponary[j][3]+"' >Eşyayı sat</button></ol>")
                     }
                 }
             }
             if(items[i][0] == "Armor"){
                 for(var j = 0; j < armory.length; j++){
-                    if(items[i][1].includes(armory[j][4])){
-                       $("#item_list").append("<ol id='"+armory[j][4]+"'>"+armory[j][0]+"<button class='wear'>Eşyayı giy</button><button class='sell'>Eşyayı sat</ol>")
+                    if(items[i][1] == "class "+armory[j][4]){
+                       $("#item_list").append("<ol>"+armory[j][0]+"<button id='"+armory[j][4]+"'"+item_action+"</button><button class='sell' id='"+armory[j][4]+"' >Eşyayı sat</button></ol>")
                     }
                 }
 
             }
             if(items[i][0] == "Shoe"){
                 for(var j = 0; j < shoery.length; j++){
-                    if(items[i][1].includes(shoery[j][4])){
-                       $("#item_list").append("<ol id='"+shoery[j][3]+"'>"+shoery[j][0]+"<button class='wear'>Eşyayı giy</button><button class='sell'>Eşyayı sat</ol>")
+                    if(items[i][1] == "class "+shoery[j][4]){
+                       $("#item_list").append("<ol>"+shoery[j][0]+"<button id='"+shoery[j][4]+"'"+item_action+"</button><button class='sell' id='"+shoery[j][4]+"' >Eşyayı sat</button></ol>")
                     }
                 }
 
             }
             if(items[i][0] == "Wizardish"){
                 for(var j = 0; j < wizardian.length; j++){
-                    if(items[i][1].includes(wizardian[j][4])){
-                       $("#item_list").append("<ol id='"+wizardian[j][4]+"'>"+wizardian[j][0]+"<button class='wear'>Eşyayı giy</button><button class='sell'>Eşyayı sat</ol>")
+                    if(items[i][1] == "class "+wizardian[j][4]){
+                       $("#item_list").append("<ol>"+wizardian[j][0]+"<button id='"+wizardian[j][4]+"'"+item_action+"</button><button class='sell' id='"+wizardian[j][4]+"' >Eşyayı sat</button></ol>")
                     }
                 }
             }
@@ -233,9 +241,49 @@
 
     $(".purchase").click(function(){
         var id = $(this).attr('id')
-        window.alert(id)
         $.post("purchase="+id+" "+characterName)
+        reload(250)
     })
+
+    $(".wear").click(function(){
+        var id = $(this).attr('id')
+        $.post("wear="+id+" "+characterName)
+        reload(250)
+    })
+
+    $(".remove").click(function(){
+      var id = $(this).attr('id')
+      $.post("remove="+id+" "+characterName)
+      reload(250)
+    })
+
+    $(".sell").click(function(){
+      var id = $(this).attr('id')
+      $.post("sell="+id+" "+characterName)
+      reload(250)
+    })
+
+    $(".closeAttack").click(function(){
+      var enemy = $(this).attr('id')
+      $.post("closeattack="+enemy+" "+characterName)
+      reload(250)
+    })
+
+    $(".wideAttack").click(function(){
+      var enemy = $(this).attr('id')
+      $.post("wideattack="+enemy+" "+characterName)
+      reload(250)
+    })
+
+    reload(60000)
+
+    function reload(loadtime){
+        setTimeout(function(){
+            window.location.reload()
+        },loadtime)
+
+    }
+
 
 
     </script>

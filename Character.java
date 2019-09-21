@@ -41,7 +41,7 @@ public abstract class Character{
     public double[] getEffectiveAbilities(){
         return this.effectiveAbilities;
     }
-    
+
     public int getMoney(){
         return this.money;
     }
@@ -60,6 +60,10 @@ public abstract class Character{
 
     public List<Item> getItems(){
         return items;
+    }
+
+    public List<Item> getWornItems(){
+      return this.wornItems;
     }
 
     public void printItemsList(){
@@ -157,9 +161,9 @@ public abstract class Character{
 
     //functions about items
     //could be implemented better in the future, after the implementation of the class Item
-    public void purchase(Item item){
+    public boolean purchase(Item item){
         if(item.getPrice() > money){
-            System.out.println("Bu itemi satın almaya paranız yetmiyor / You can't buy this item, because you don't have enough money");
+            return false;
         }else{
             //farmer gets products with 10% discount
             if(this instanceof Farmer){
@@ -172,24 +176,32 @@ public abstract class Character{
                 this.money = this.money - item.getPrice();
 
             items.add(item);
-            System.out.println("Satın alma işlemi başarı ile gerçekleştirilmiştir");
+            return true;
+
         }
     }
 
     public void sellItem(Item item){
-        wornItems.remove(item);
+        this.removeItem(item);
         if(items.remove(item)){
-            this.money = this.money + item.getPrice()*(4/5);
+            double m = item.getPrice();
+            int a = (int) (m*(0.8));
+            System.out.println(a);
+            this.money = this.money + a;
+            System.out.println(this.money);
+        }
+        else{
+          throw new IllegalArgumentException("Eşya satılamadı.");
         }
     }
+    int weapons = 0;
+    int armors = 0;
+    int shoes = 0;
 
     //this function updates effectiveAbilities
-    public void wearItem(Item item){
+    public boolean wearItem(Item item){
         //a character can only wear one weapon, one armor, one pair of shoes
         //for wizardish he can wear everything he wants
-        int weapons = 0;
-        int armors = 0;
-        int shoes = 0;
         for(Item i: wornItems){
             if(i instanceof Shoe)
                 shoes++;
@@ -201,26 +213,28 @@ public abstract class Character{
 
         if(item instanceof Weapon && weapons >= 2){
             System.out.println("Bu item giyilemez");
-            return;
+            return false;
         }
         if(item instanceof Shoe && shoes >= 1){
             System.out.println("Bu item giyilemez");
-            return;
+            return false;
         }
         if(item instanceof Armor && armors >= 1){
             System.out.println("Bu item giyilemez");
-            return;
+            return false;
         }
 
     //control if the character posses the item
-    if(!items.contains(item))
+    if(!items.contains(item)){
         System.out.println("Bu işlemi gerçekleştirebilmek için önce bu eşyayı satın almalısınız");
-    else{
+        return false;
+    }
         wornItems.add(item);
         for(int i = 0; i < this.effectiveAbilities.length; i++){
             this.effectiveAbilities[i] = this.effectiveAbilities[i] + item.getPlusEffect()[i];
+            System.out.println(this.effectiveAbilities[i]);
         }
-    }
+        return true;
     }
 
     public void removeItem(Item item){
@@ -232,5 +246,15 @@ public abstract class Character{
                 this.effectiveAbilities[i] = this.effectiveAbilities[i] - item.getPlusEffect()[i];
             }
         }
+    }
+
+    public Item getItemByType(String type){
+        for(Item item: this.items){
+            String itemClass = item.getClass().toString();
+            if(itemClass.equals("class "+type)){
+                return item;
+            }
+        }
+        return null;
     }
 }

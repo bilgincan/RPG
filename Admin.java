@@ -22,13 +22,25 @@ public class Admin{
             if(p.getPlayerName().equals(name))
                 return p;
         }
+        return null;
+    }
+
+    public Player getPlayerByCharacterName(String characterName){
+      for(Player p: this.players){
+            if(p.getCharacter().getCharacterName().equals(characterName))
+                return p;
+        }
+        return null;
     }
 
     public Character getCharacterByName(String name){
         for(Player p: this.players){
+            // System.out.println(p.getCharacter().getCharacterName());
+            // System.out.println(name);
             if(p.getCharacter().getCharacterName().equals(name))
                 return p.getCharacter();
         }
+        return null;
     }
 
     public void giveMoney(int plusMoney,Player player){
@@ -72,6 +84,16 @@ public class Admin{
         player.setAdmin(this);
         return true;
 
+    }
+
+    public Villian VillianisKilled(){
+        for(Villian v: villians){
+          if(v.getCharacter().getHealth() <= 0){
+            villians.remove(v);
+            return v;
+          }
+        }
+        return null;
     }
 
     //resets characters and villians

@@ -53,21 +53,44 @@ public class GameServer{
             printHTMLPage(homePage);
         }
 
-            //load html files by names
-            if(input.contains("GET /htmlCodes/") && !input.contains("player.html")){
+        if(input.contains("purchase")){
+            String []parts = input.split("chase=");
+            buyItem(parts[1]);
+        }
+
+        if(input.contains("wear")){
+            String[] parts = input.split("wear=");
+            wearItem(parts[1]);
+        }
+        if(input.contains("remove")){
+            String[] parts = input.split("remove=");
+            removeItem(parts[1]);
+        }
+        if(input.contains("sell")){
+            String[] parts = input.split("sell=");
+            sellItem(parts[1]);
+        }
+        if(input.contains("closeattack")){
+            String[] parts = input.split("closeattack");
+            Attack(parts[1],true);
+        }
+        if(input.contains("wideattack")){
+          String[] parts = input.split("wideattack");
+          Attack(parts[1],false);
+        }
+
+        //load html files by names
+        if(input.contains("GET /htmlCodes/") && !input.contains("player.html")){
                 String[] parts = input.split("/");
                 String file = parts[2];
                 parts = file.split(" ");
                 file = "../htmlCodes/";
                 file += parts[0];
 
-                if(!parts[0].contains("purchase")){
-                    parts = file.split("chase=");
-                    buyItem(parts[1]);
-                }
 
                 printHTMLPage(file);
             }
+
 
             //write character abilities in the html file
             if(input.contains("current=")){
@@ -75,7 +98,7 @@ public class GameServer{
                 String character = parts[1];
                 parts = character.split(" HTTP");
                 character = parts[0];
-                System.out.println(character);
+
 
                 defineAbilitiesForJS(character);
 
@@ -135,6 +158,7 @@ public class GameServer{
 
     private void initializeAdmin(){
         this.admin = new Admin();
+        this.admin.generateEnemy("BlackSmith");
     }
 
     private void defineAbilitiesForJS(String character){
@@ -179,19 +203,26 @@ public class GameServer{
 
             jsCode += "var items = [";
             List<Item> items = charprint.getItems();
+            List<Item> wornItems = charprint.getWornItems();
+            boolean worn;
+
             for(int i = 0; i< items.size(); i++){
                 Item item = items.get(i);
+                //send items as array in the js code 0 ==> type of item, 1 ==> item, 2 ==> if it is worn or not
+                if(wornItems.contains(item)) worn = true;
+                else worn = false;
+
                 if(item instanceof Weapon){
-                    jsCode += "['Weapon','"+item.getClass()+"']";
+                    jsCode += "['Weapon','"+item.getClass()+"',"+worn+"]";
                 }
                 else if(item instanceof Shoe){
-                    jsCode += "['Shoe','"+item.getClass()+"']";
+                    jsCode += "['Shoe','"+item.getClass()+"',"+worn+"]";
                 }
                 else if(item instanceof Armor){
-                    jsCode += "['Armor','"+item.getClass()+"']";
+                    jsCode += "['Armor','"+item.getClass()+"',"+worn+"]";
                 }
                 else if(item instanceof Wizardish){
-                    jsCode += "['Wizardish','"+item.getClass()+"']";
+                    jsCode += "['Wizardish','"+item.getClass()+"',"+worn+"]";
                 }
                 if(i < items.size()-1){
                     jsCode += " , ";
@@ -238,6 +269,7 @@ public class GameServer{
     }
 
     }
+
     private void printHTMLPage(String page){
         try{
 
@@ -263,15 +295,73 @@ public class GameServer{
 }
 
     private void buyItem(String itemName){
-        String[] parts = itemName.split(" ");
-        String item = parts[0];
-        String characterName = parts[1];
+        String[] orderQuery = getItemAndCharacterFromQuery(itemName);
+        String itemstring = orderQuery[0];
+        String characterName = orderQuery[1];
+        try{
+            Item item = convertStringtoItem(itemstring);
 
-        Character character = admin.getCharacterByName(characterName);
-        character.purchase(item);
+            Character character = admin.getCharacterByName(characterName);
+
+            if(character.purchase(item)){
+                printHTMLPage(player_page);
+                alert("Eşya alma işlemi başarılı, hayırlı olsun");
+            }
+            else{
+                printHTMLPage(player_page);
+                alert("Maalesef eşyayı alamadın, fakir puşt.");
+            }
+
+        }catch(NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
-    private Item convertStringtoItem(String item){
+    private String[] getItemAndCharacterFromQuery(String query){
+        String[] parts = query.split("%20");
+        String itemstring = parts[0];
+        parts = parts[1].split(" HTTP");
+        String characterName = parts[0];
+        String [] returned = {itemstring,characterName};
+
+        return returned;
+    }
+    private TwoInOne<Character,Item> getItemAndCharacterObjectsFromQuery(String itemName){
+      String[] orderQuery = getItemAndCharacterFromQuery(itemName);
+      String itemstring = orderQuery[0];
+      String characterName = orderQuery[1];
+      try{
+          Character character = admin.getCharacterByName(characterName);
+          Item item = character.getItemByType(itemstring);
+          return new TwoInOne<Character,Item>(character,item);
+        }catch(NullPointerException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    private void wearItem(String itemName){
+      TwoInOne<Character,Item> characterItemMap = getItemAndCharacterObjectsFromQuery(itemName);
+      Character character = characterItemMap.getFirst();
+      Item item = characterItemMap.getSecond();
+
+      character.wearItem(item);
+    }
+    private void removeItem(String itemName){
+      TwoInOne<Character,Item> characterItemMap = getItemAndCharacterObjectsFromQuery(itemName);
+      Character character = characterItemMap.getFirst();
+      Item item = characterItemMap.getSecond();
+
+      character.removeItem(item);
+    }
+    private void sellItem(String itemName){
+      TwoInOne<Character,Item> characterItemMap = getItemAndCharacterObjectsFromQuery(itemName);
+      Character character = characterItemMap.getFirst();
+      Item item = characterItemMap.getSecond();
+
+      character.sellItem(item);
+    }
+
+    private static Item convertStringtoItem(String item){
         switch(item){
             case "ShortSword": return new ShortSword();
             case "LongSword": return new LongSword();
@@ -280,19 +370,79 @@ public class GameServer{
             case "BattleAxe": return new BattleAxe();
             case "Bow": return new Bow();
             case "CrossBow": return new CrossBow();
-            case "LightArmor": return new LigthArmor();
+            case "LightArmor": return new LightArmor();
             case "MediumArmor": return new MediumArmor();
             case "HeavyArmor": return new HeavyArmor();
             case "TankArmor": return new TankArmor();
+            case "Sandal": return new Sandal();
+            case "LightShoe": return new LightShoe();
+            case "SportShoe": return new SportShoe();
+            case "LightArmoredShoe": return new LightArmoredShoe();
+            case "MediumArmoredShoe": return new MediumArmoredShoe();
+            case "HeavyShoe": return new HeavyShoe();
+            case "Wand": return new Wand();
+            case "Sunglasses": return new Sunglasses();
+            case "Cloak": return new Cloak();
+            default: return null;
         }
     }
+    private void Attack(String enemyString,boolean close){
+      String parts[] = enemyString.split("%20");
+      parts = parts[2].split(" HTTP");
+      String characterString = parts[0];
+
+      Player character =this.admin.getPlayerByCharacterName(characterString);
+      Character enemy = null;
+
+      if(enemyString.contains("Boss")){
+        enemy = getEnemy("Boss");
+      }
+      else if (enemyString.contains("Knight")) {
+        enemy = getEnemy("Knight");
+      }else if (enemyString.contains("Farmer")) {
+        enemy = getEnemy("Farmer");
+      }else if (enemyString.contains("Wizard")) {
+        enemy = getEnemy("Wizard");
+      }else if (enemyString.contains("BlackSmith")) {
+        enemy = getEnemy("BlackSmith");
+      }else if (enemyString.contains("Barbarian")) {
+        enemy = getEnemy("Barbarian");
+      }else if (enemyString.contains("Wolfman")) {
+        enemy = getEnemy("Wolfman");
+      }
+      if(enemy == null)
+        throw new NullPointerException("Enemy is null");
+      if(close){
+        character.closeAttack(enemy);
+      }else{
+        character.wideAttack(enemy);
+      }
+      Villian villian = this.admin.VillianisKilled();
+      if(villian != null){
+        alert("Düşman öldürüldü: "+villian);
+      }
+    }
+    private Character getEnemy(String type){
+      List<Villian> villians = this.admin.getVillians();
+      for(Villian v: villians){
+        if(v.getCharacter().getClass().toString().equals("class "+type))
+          return v.getCharacter();
+      }
+      return null;
+    }
     private void alert(){
+        alert("Lütfen karakterin tipi seçiniz, karakterin ismini yazınız ve kendi isminizi yazınız. Not: karakterinin ismi başka bir karakterle aynı ismi taşıyorsa da bu mesajı alıyor olabilirsin.");
+    }
+    private void alert(String message){
+      System.out.println("tetiklendi");
         try{
             PrintStream out = new PrintStream(socket.getOutputStream());
-            out.println("<script>window.alert('Lütfen karakterin tipi seçiniz, karakterin ismini yazınız ve kendi isminizi yazınız. Not: karakterinin ismi başka bir karakterle aynı ismi taşıyorsa da bu mesajı alıyor olabilirsin.')</script>");
+            out.println("<script>window.alert('"+message+"')</script>");
             out.flush();
         }catch(IOException ex){
             ex.printStackTrace();
+        }catch(Exception a){
+            a.printStackTrace();
         }
     }
     public static void main(String[] a) throws IOException{
