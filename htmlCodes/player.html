@@ -2,6 +2,8 @@
 <head>
     <meta charset="utf-8">
     <title>Karakter Sayfası</title>
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 </head>
 <body>
     <div>
@@ -23,27 +25,36 @@
     </div>
 
     <ul class="abilities">
-        <font size="+2">
+        <font size="+1">
         <li id="character_type">karakter türü:</li><br>
-        <li>Yetenekler:</li><br>
-        <ol id=0>atak(yakın):</ol><br>
-        <ol id=1>atak(uzak):</ol><br>
-        <ol id=2>defans:</ol><br>
-        <ol id=3>hız:</ol><br>
-        <ol id=4>kaçınma (dodge):</ol><br>
-        <ol id=5>ikna:</ol><br>
-        <ol id=6>araştırma:</ol><br>
-        <ol id=7>gizlenme:</ol><br>
-        <ol id=8>tedavi etme:</ol><br>
+        <li>Yetenekler:</li>
+        <ol id=0>atak(yakın):</ol>
+        <ol id=1>atak(uzak):</ol>
+        <ol id=2>defans:</ol>
+        <ol id=3><button id="run" name="command" type="button" class="btn btn-secondary">Koş</button>hız:</ol>
+        <ol id=4>kaçınma (dodge):</ol>
+        <ol id=5><button id="persuate" name="command" type="button" class="btn btn-secondary">İkna Et</button>ikna:</ol>
+        <ol id=6><button id="investigate" name="command" type="button" class="btn btn-secondary">Araştır</button>araştırma:</ol>
+        <ol id=7><button id="sneak" name="command" type="button" class="btn btn-secondary">Saklan</button>gizlenme:</ol>
+        <ol id=8><button id="heal" name="command" type="button" class="btn btn-secondary">Tedavi et</button>tedavi etme:</ol>
     </font>
     </ul>
+
+    <div id="eventsInStory">
+      <h4>Olaylar:</h4>
+      <font size="+0.5">
+        <div id="log">
+        </div>
+        </font>
+    </div>
 
     <div class='items'>
         <h2 class='item_sec' id='items_title'>Eşyalar:</h2>
         <ul id='item_list'>
         </ul>
-        <h2 class='item_sec' id='market_place'>Market:</h2>
+        <button id='closeMarket' type="button" class="btn btn-info">Marketi Aç/Kapat</button>
         <div class='products'>
+          <h2 class='item_sec' id='market_place'>Market:</h2>
         <div id='weapons'>
             <h3>Silahlar:</h3>
             <ul id="weaponary">
@@ -65,14 +76,10 @@
             </ul>
         </div>
     </div>
-
-
     </div>
-
 
     <script src="/htmlCodes/jquery-3.2.1.js"></script>
     <script>
-
     //character abilities etc. datas
     var characterName;
     var abilities;
@@ -95,16 +102,18 @@
     printValues()
     printMarket()
     printItemList()
+    closeMarket()
 
+    $("#log").load('../log');
 
     //css codes
     $("#values_section").css({"position":"absolute","right":"15%","top":"0%"})
-    $("#enemies").css({"position":"absolute","left":"20%","top":"7%","color":"red"})
-    $(".abilities").css({"position":"absolute","top":"15%","background-color":"orange"})
+    $("#enemies").css({"position":"absolute","left":"45%","top":"7%","color":"red"})
+    $(".abilities").css({"position":"absolute","top":"15%","background-color":"orange","border-radius": "7%"})
     $("#money").css({"color":"gold"})
     $("#health").css("color","green")
     $("#sanity").css("color","powderblue")
-    $(".items").css({"position":"absolute","left":"40%","top":"23%","background-color":"#329ba8","width":"60%","height":"150%"})
+    $(".items").css({"position":"absolute","left":"70%","top":"23%","background-color":"#329ba8","border-style": "solid", "border-radius": "5%"})
     $(".item_sec").css("color","#aaf542")
     $("#armors").css({"position":"absolute","top":"20%","left":"55%","width":"30%"})
     $("#weapons").css({"position":"absolute","top":"20%","left":"0%"})
@@ -114,12 +123,55 @@
     $("seg#price").css("color","yellow")
     $("seg#negs").css("color","#c43408")
     $(".purchase").css({"position":"absolute","left":"105%","height":"10%","width":"35%","color":"#ed1515","background-color":"#edebcc"})
+    $("#eventsInStory").css({"position":"absolute","left":"17%","top":"15%","border-style":"inset","border-width":"thick","border-color":"green"})
 
     $(".purchase").mouseenter(function(){
         $(this).css("cursor","grab")
     })
     $(".purchase").mouseleave(function(){
         $(this).css("cursor","auto")
+    })
+
+    $("#run").hide()
+    $("#persuate").hide()
+    $("#investigate").hide()
+    $("#sneak").hide()
+    $("#heal").hide()
+    //perform actions
+    $("#3").mouseenter(function(){
+      $("#run").show()
+    })
+    $("#3").mouseleave(function(){
+      $("#run").hide()
+    })
+    $("#5").mouseenter(function(){
+      $("#persuate").show()
+    })
+    $("#5").mouseleave(function(){
+      $("#persuate").hide()
+    })
+    $("#6").mouseenter(function(){
+      $("#investigate").show()
+    })
+    $("#6").mouseleave(function(){
+      $("#investigate").hide()
+    })
+    $("#7").mouseenter(function(){
+      $("#sneak").show()
+    })
+    $("#7").mouseleave(function(){
+      $("#sneak").hide()
+    })
+    $("#8").mouseenter(function(){
+      $("#heal").show()
+    })
+    $("#8").mouseleave(function(){
+      $("#heal").hide()
+    })
+    $("button[name='command']").click(function(){
+      var id = $(this).attr('id');
+      $.post("command="+id+" character="+characterName);
+      reload(250);
     })
 
 
@@ -167,7 +219,7 @@
             }
 
             var enemyHealth = enemies[i][1]
-            $("#enemy_list").append(enemyHealth+"<br><button id='"+enemyName+"' class='closeAttack'>Yakından saldır</button><button id='"+enemyName+"' class='wideAttack'>Uzaktan saldır</button></li>")
+            $("#enemy_list").append(enemyHealth+"<br><button id='"+enemyName+"' name='closeAttack' class='btn btn-danger'>Yakından saldır</button>&nbsp;<button id='"+enemyName+"' name='wideAttack' class='btn btn-danger'>Uzaktan saldır</button></li>")
 
         }
 
@@ -180,22 +232,22 @@
         for(var i = 0; i < items.length; i++){
           //from server I receive if it is worn or not
           if(items[i][2] == true){
-            item_action = "class='remove'>Eşyayı çıkar"
+            item_action = "class='btn btn-danger' name='remove'>Eşyayı çıkar"
           }else{
-            item_action = "class='wear'>Eşyayı giy"
+            item_action = "class='btn btn-success' name='wear'>Eşyayı giy"
           }
             if(items[i][0] == "Weapon"){
                 for(var j = 0; j < weaponary.length; j++){
                     if(items[i][1] == "class "+weaponary[j][3]){
                       console.log(weaponary[j][3])
-                       $("#item_list").append("<ol>"+weaponary[j][0]+"<button id='"+weaponary[j][3]+"' "+item_action+"</button><button class='sell' id='"+weaponary[j][3]+"' >Eşyayı sat</button></ol>")
+                       $("#item_list").append("<ol>"+weaponary[j][0]+"<button id='"+weaponary[j][3]+"' "+item_action+"</button><button name='sell'type='button' class='btn btn-warning' id='"+weaponary[j][3]+"' >Eşyayı sat</button></ol>")
                     }
                 }
             }
             if(items[i][0] == "Armor"){
                 for(var j = 0; j < armory.length; j++){
                     if(items[i][1] == "class "+armory[j][4]){
-                       $("#item_list").append("<ol>"+armory[j][0]+"<button id='"+armory[j][4]+"'"+item_action+"</button><button class='sell' id='"+armory[j][4]+"' >Eşyayı sat</button></ol>")
+                       $("#item_list").append("<ol>"+armory[j][0]+"<button id='"+armory[j][4]+"'"+item_action+"</button><button name='sell' type='button' class='btn btn-warning' id='"+armory[j][4]+"' >Eşyayı sat</button></ol>")
                     }
                 }
 
@@ -203,7 +255,7 @@
             if(items[i][0] == "Shoe"){
                 for(var j = 0; j < shoery.length; j++){
                     if(items[i][1] == "class "+shoery[j][4]){
-                       $("#item_list").append("<ol>"+shoery[j][0]+"<button id='"+shoery[j][4]+"'"+item_action+"</button><button class='sell' id='"+shoery[j][4]+"' >Eşyayı sat</button></ol>")
+                       $("#item_list").append("<ol>"+shoery[j][0]+"<button id='"+shoery[j][4]+"'"+item_action+"</button><button name='sell' type='button' class='btn btn-warning' id='"+shoery[j][4]+"' >Eşyayı sat</button></ol>")
                     }
                 }
 
@@ -211,7 +263,7 @@
             if(items[i][0] == "Wizardish"){
                 for(var j = 0; j < wizardian.length; j++){
                     if(items[i][1] == "class "+wizardian[j][4]){
-                       $("#item_list").append("<ol>"+wizardian[j][0]+"<button id='"+wizardian[j][4]+"'"+item_action+"</button><button class='sell' id='"+wizardian[j][4]+"' >Eşyayı sat</button></ol>")
+                       $("#item_list").append("<ol>"+wizardian[j][0]+"<button id='"+wizardian[j][4]+"'"+item_action+"</button><button name='sell'type='button' class='btn btn-warning' id='"+wizardian[j][4]+"' >Eşyayı sat</button></ol>")
                     }
                 }
             }
@@ -245,35 +297,54 @@
         reload(250)
     })
 
-    $(".wear").click(function(){
+    $('button[name="wear"]').click(function(){
         var id = $(this).attr('id')
         $.post("wear="+id+" "+characterName)
         reload(250)
     })
 
-    $(".remove").click(function(){
+    $('button[name="remove"]').click(function(){
       var id = $(this).attr('id')
       $.post("remove="+id+" "+characterName)
       reload(250)
     })
 
-    $(".sell").click(function(){
+    $("button[name='sell']").click(function(){
       var id = $(this).attr('id')
       $.post("sell="+id+" "+characterName)
       reload(250)
     })
 
-    $(".closeAttack").click(function(){
+    $("button[name='closeAttack']").click(function(){
       var enemy = $(this).attr('id')
       $.post("closeattack="+enemy+" "+characterName)
       reload(250)
     })
 
-    $(".wideAttack").click(function(){
+    $("button[name='wideAttack']").click(function(){
       var enemy = $(this).attr('id')
       $.post("wideattack="+enemy+" "+characterName)
       reload(250)
     })
+
+    //this is boolean
+    var marketClosed = true;
+    //this closes the market section visually
+    function closeMarket(){
+      $(".products").hide()
+      $(".items").css({"left":"70%","height":"30%","width":"23%"})
+    }
+    $("button#closeMarket").click(function(){
+      if(marketClosed == true){
+        marketClosed = false;
+        $(".items").css({"left":"40%","height":"150%","width":"60%"})
+        $(".products").show()
+      }else{
+        marketClosed = true;
+        closeMarket()
+      }
+    })
+
 
     reload(60000)
 

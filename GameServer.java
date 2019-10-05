@@ -6,14 +6,12 @@ public class GameServer{
     private final ServerSocket server;
     private static final String homePage = "../htmlCodes/index.html";
     private static final String player_page = "../htmlCodes/player.html";
-    private Admin admin;
+    private static final String adminPage = "../htmlCodes/admin.html";
+    private Admin admin = null;
     private Socket socket;
 
     public GameServer(int port) throws IOException{
         server = new ServerSocket(port);
-
-        //you must delete this line after tests
-        initializeAdmin();
     }
 
     private void run(){
@@ -33,8 +31,6 @@ public class GameServer{
                 e.printStackTrace();
             }
         }
-
-
     }
 
     private void systemon(java.net.Socket socket){
@@ -42,17 +38,19 @@ public class GameServer{
 
         try{
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintStream out = new PrintStream(socket.getOutputStream());
-
             //for getting inputs from the user
             String input = in.readLine();
             System.out.println(input);
 
-
             if(input.equals("GET / HTTP/1.1")){
             printHTMLPage(homePage);
         }
+        if(input.contains("Admin")){
+          if(this.admin == null)
+            this.admin = new Admin();
 
+            renderAllPlayersinJSCode();
+        }
         if(input.contains("purchase")){
             String []parts = input.split("chase=");
             buyItem(parts[1]);
@@ -78,6 +76,11 @@ public class GameServer{
           String[] parts = input.split("wideattack");
           Attack(parts[1],false);
         }
+        if(input.contains("command")){
+          String[] parts = input.split("character=");
+          String characterName = parts[1].split(" HTTP")[0];
+          takeAction(input, characterName);
+        }
 
         //load html files by names
         if(input.contains("GET /htmlCodes/") && !input.contains("player.html")){
@@ -86,24 +89,16 @@ public class GameServer{
                 parts = file.split(" ");
                 file = "../htmlCodes/";
                 file += parts[0];
-
-
                 printHTMLPage(file);
             }
-
-
             //write character abilities in the html file
             if(input.contains("current=")){
                 String parts[] = input.split("current=");
                 String character = parts[1];
                 parts = character.split(" HTTP");
                 character = parts[0];
-
-
-                defineAbilitiesForJS(character);
-
+                defineAbilitiesForJS(character,player_page);
                 }
-
 
             //extract the input
             if(this.admin != null && input.contains("GET /initializeCharacters?")){
@@ -125,16 +120,13 @@ public class GameServer{
                 //if the character can be initiazed load the character page
                 if(initializePlayer(playerName,characterName,character)){
                     System.out.println("Karakter yaratıldı");
-                    defineAbilitiesForJS(characterName);
+                    defineAbilitiesForJS(characterName,player_page);
                 }
                 else{
                     printHTMLPage(homePage);
                     alert();
                 }
             }
-
-            System.out.println(this.admin.getPlayers().toString());
-
         }catch(IOException e){
             e.printStackTrace();
         }catch(NullPointerException e){
@@ -156,12 +148,7 @@ public class GameServer{
         }
     }
 
-    private void initializeAdmin(){
-        this.admin = new Admin();
-        this.admin.generateEnemy("BlackSmith");
-    }
-
-    private void defineAbilitiesForJS(String character){
+    private void defineAbilitiesForJS(String character,String printPage){
         Iterator playerIterator = this.admin.getPlayers().iterator();
         Player temp;
         Player neededOne = null;
@@ -175,22 +162,9 @@ public class GameServer{
         if(neededOne == null){
             System.out.println("İzinsiz giriş denemesi/ Böyle bir karakter yok");
         }else{
-            //printing abilities of the character in to the web browser
+            String jsCode = "";
             Character charprint = neededOne.getCharacter();
-            double[] abilities = charprint.getAbilities();
-            String jsCode = "var characterName = '"+charprint.getCharacterName()+"'; ";
-            jsCode += "var characterType = '"+charprint.getClass()+"';";
-            jsCode += "var money = "+charprint.getMoney()+";";
-            jsCode += "var health = "+charprint.getHealth()+";";
-            jsCode += "var sanity = "+charprint.getSanity()+";";
-            jsCode += "var abilities = [";
-            for(int i = 0; i<abilities.length;i++){
-                jsCode+=abilities[i];
-                if(i < abilities.length-1)
-                    jsCode += ",";
-            }
-            jsCode += "];";
-
+            jsCode += renderAbilitiesIntoJsCode(neededOne);
             List<Villian> enemies = this.admin.getVillians();
             jsCode += "var enemies = [";
             for(int i = 0; i < enemies.size(); i++){
@@ -229,8 +203,34 @@ public class GameServer{
                 }
             }
             jsCode += "];";
-            printHTMLPage(player_page,jsCode);
+            printHTMLPage(printPage,jsCode);
         }
+    }
+    private String renderAbilitiesIntoJsCode(Player player){
+      //printing abilities of the character in to the web browser
+      Character charprint = player.getCharacter();
+      double[] abilities = charprint.getAbilities();
+      String jsCode = "var characterName = '"+charprint.getCharacterName()+"'; ";
+      jsCode += "var characterType = '"+charprint.getClass()+"';";
+      jsCode += "var money = "+charprint.getMoney()+";";
+      jsCode += "var health = "+charprint.getHealth()+";";
+      jsCode += "var sanity = "+charprint.getSanity()+";";
+      jsCode += "var abilities = [";
+      for(int i = 0; i<abilities.length;i++){
+          jsCode+=abilities[i];
+          if(i < abilities.length-1)
+              jsCode += ",";
+      }
+      jsCode += "];";
+      return jsCode;
+    }
+    private void renderAllPlayersinJSCode(){
+      String jsCode = "var players = new Array();";
+      for(Player p: this.admin.getPlayers()){
+        Character c = p.getCharacter();
+        jsCode += "players.push(new player('"+c.getCharacterName()+"','"+c.getClass()+"','"+p.getPlayerName()+"',"+Arrays.toString(c.getAbilities())+","+c.getMoney()+","+c.getSanity()+","+c.getHealth()+"));";
+      }
+      printHTMLPage(adminPage, jsCode);
     }
     //for printing javascript datas with html
     private void printHTMLPage(String page,String jsCodes){
@@ -263,7 +263,6 @@ public class GameServer{
 
         out.println("HTTP/1.1 \nContent-Type: text/html\n\r\n");
         out.println(content);
-        out.flush();
     }catch(Exception e){
         e.printStackTrace();
     }
@@ -430,12 +429,40 @@ public class GameServer{
       }
       return null;
     }
+    private int takeAction(String action,String characterName) throws Exception{
+      Character character = admin.getCharacterByName(characterName);
+      if(action.contains("run")){
+        int val = (int) character.run();
+        logWriter(characterName+" "+val+" puan ile depara kalktı");
+        return val;
+      }
+      if(action.contains("persuate")){
+        int val = (int) character.convince();
+        logWriter(characterName+" "+val+" puan ile ikna kabiliyetini kullandı.");
+        return val;
+      }
+      if(action.contains("investigate")){
+        int val = (int) character.investigate();
+        logWriter(characterName+" "+val+" puan ile araştırma kabiliyetini kullandı.");
+        return val;
+      }
+      if(action.contains("sneak")){
+        int val = (int) character.sneak();
+        logWriter(characterName+" "+val+" puan ile gizlendi.");
+        return val;
+      }
+      if(action.contains("heal")){
+        int val = (int) character.heal();
+        logWriter(characterName+" "+val+" puan ile iyileştirme yeteneğini kullandı.");
+      }
+      throw new Exception("aksiyon uygulanırken bir hata meydana geldi");
+    }
     private void alert(){
         alert("Lütfen karakterin tipi seçiniz, karakterin ismini yazınız ve kendi isminizi yazınız. Not: karakterinin ismi başka bir karakterle aynı ismi taşıyorsa da bu mesajı alıyor olabilirsin.");
     }
     private void alert(String message){
-      System.out.println("tetiklendi");
         try{
+          System.out.println("tetiklendi");
             PrintStream out = new PrintStream(socket.getOutputStream());
             out.println("<script>window.alert('"+message+"')</script>");
             out.flush();
@@ -445,6 +472,28 @@ public class GameServer{
             a.printStackTrace();
         }
     }
+    public static void logWriter(String log)throws IOException {
+    controlSizeOfLogFile();
+    BufferedWriter writer = new BufferedWriter(new FileWriter("../htmlCodes/log", true));
+    writer.append("<br>\n");
+    writer.append(">"+log);
+    writer.close();
+    }
+    private static void controlSizeOfLogFile()throws IOException{
+    int line = 0;
+    BufferedReader reader = new BufferedReader(new FileReader("../htmlCodes/log"));
+    while(reader.ready()){
+      line++;
+      reader.readLine();
+    }
+    reader.close();
+    if(line > 10){
+      BufferedWriter writer = new BufferedWriter(new FileWriter("../htmlCodes/log", false));
+      writer.write("");
+      writer.flush();
+      writer.close();
+    }
+  }
     public static void main(String[] a) throws IOException{
         GameServer server = new GameServer(8080);
         while(true)

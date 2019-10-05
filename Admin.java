@@ -83,7 +83,6 @@ public class Admin{
         players.add(player);
         player.setAdmin(this);
         return true;
-
     }
 
     public Villian VillianisKilled(){

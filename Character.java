@@ -12,7 +12,7 @@ public abstract class Character{
     private double[] effectiveAbilities;
 
     protected void rollDice(){
-        this.dice = (int) (Math.random() * 10+1);
+        this.dice = (int) (Math.random() * 20+1);
     }
 
     public Character(int health, int sanity, int closeDamage, int wideDamage, int defence, int speed, int dodge, int persuasive, int investigation, int sneak,int abilityOfHeal,String CharacterName, Player User,int money){
@@ -108,26 +108,30 @@ public abstract class Character{
 
     //attackpoints is the damage of the attacking character
     public double defence(double attackpoints){
+      try {
         rollDice();
-        // System.out.println("Saldırıyı savuşturmak için zar atıldı, gelen sayı: "+this.dice);
         int dodged = (int) this.dodgeAttack();
         if(dodged > 50){
-            System.out.println("Saldırı savuşturuldu");
+            GameServer.logWriter(this.CharacterName+" saldırıyı savuşturdu, çatışmadan hasar almadan çıktı.");
             return 0;
         }
         rollDice();
-        //System.out.println("Savunma için zar atıldı gelen sayı: "+this.dice);
         double defence = attackpoints - (effectiveAbilities[2]*dice/2);
         if(defence <= 0){
-            System.out.println("Saldırıdan hiç hasar almadan çıkıldı.");
+            GameServer.logWriter(this.CharacterName+" saldırıdan hiç hasar almadan çıktı.");
             return 0;
         }
         else{
             this.health = this.health - (int) defence;
             if(this.health < 0)
-                System.out.println(this.CharacterName+" öldü.");
+                GameServer.logWriter(this.CharacterName+" öldü.");
             return defence;
         }
+
+      } catch(Exception e) {
+        e.printStackTrace();
+      }
+      return 0;
     }
 
     //dodgeAttack is a hepling method for defence
@@ -137,25 +141,25 @@ public abstract class Character{
 
     public double investigate(){
         rollDice();
-        //System.out.println("Zar atıldı gelen sayı: "+this.dice);
         return effectiveAbilities[6]*dice;
     }
 
+    public double run(){
+      rollDice();
+      return effectiveAbilities[3]*dice;
+    }
     public double sneak(){
         rollDice();
-        System.out.println("Zar atıldı gelen sayı: "+this.dice);
         return effectiveAbilities[7]*dice;
     }
 
     public double heal(){
         rollDice();
-        System.out.println("Zar atıldı gelen sayı: "+this.dice);
         return effectiveAbilities[8]*dice;
     }
 
     public double convince(){
         rollDice();
-        //System.out.println("Zar atıldı gelen sayı: "+this.dice);
         return effectiveAbilities[5]*dice;
     }
 
@@ -186,53 +190,71 @@ public abstract class Character{
         if(items.remove(item)){
             double m = item.getPrice();
             int a = (int) (m*(0.8));
-            System.out.println(a);
             this.money = this.money + a;
-            System.out.println(this.money);
         }
         else{
           throw new IllegalArgumentException("Eşya satılamadı.");
         }
     }
-    int weapons = 0;
-    int armors = 0;
-    int shoes = 0;
 
     //this function updates effectiveAbilities
     public boolean wearItem(Item item){
         //a character can only wear one weapon, one armor, one pair of shoes
         //for wizardish he can wear everything he wants
+        int weapons = 0;
+        int armors = 0;
+        int shoes = 0;
         for(Item i: wornItems){
-            if(i instanceof Shoe)
-                shoes++;
             if(i instanceof Weapon)
                 weapons++;
-            if(i instanceof Armor)
+            else if(i instanceof Shoe)
+                shoes++;
+            else if(i instanceof Armor)
                 armors++;
         }
 
-        if(item instanceof Weapon && weapons >= 2){
+        if(item instanceof Weapon && weapons >= 1){
+          try {
+            GameServer.logWriter("Uyarı:"+this.CharacterName+" seçilen ürünü giyemez");
             System.out.println("Bu item giyilemez");
+          }catch(Exception e){
+            e.printStackTrace();
+          }
+
             return false;
         }
         if(item instanceof Shoe && shoes >= 1){
-            System.out.println("Bu item giyilemez");
+          try {
+          GameServer.logWriter("Uyarı:"+this.CharacterName+" seçilen ürnü giyemez");
+          System.out.println("Bu item giyilemez");
+          } catch(Exception e) {
+            e.printStackTrace();
+          }
             return false;
         }
         if(item instanceof Armor && armors >= 1){
+          try {
+            GameServer.logWriter("Uyarı:"+this.CharacterName+" seçilen ürünü giyemez");
             System.out.println("Bu item giyilemez");
+          } catch(Exception e) {
+            e.printStackTrace();
+          }
             return false;
         }
 
     //control if the character posses the item
     if(!items.contains(item)){
+      try {
+        GameServer.logWriter("Uyarı:"+this.CharacterName+" seçilen ürünü giyemez, öncelikle eşya satın alınmalı");
         System.out.println("Bu işlemi gerçekleştirebilmek için önce bu eşyayı satın almalısınız");
+      } catch(Exception e) {
+          e.printStackTrace();
+      }
         return false;
     }
         wornItems.add(item);
         for(int i = 0; i < this.effectiveAbilities.length; i++){
             this.effectiveAbilities[i] = this.effectiveAbilities[i] + item.getPlusEffect()[i];
-            System.out.println(this.effectiveAbilities[i]);
         }
         return true;
     }

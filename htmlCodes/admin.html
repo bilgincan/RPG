@@ -1,9 +1,47 @@
 <html>
-  <head>
-    <title>Hikaye Anlatıcı</title>
-    <meta charset="utf-8">
-  </head>
-  <body>
-    
-  </body>
+
+<head>
+  <title>Hikaye Anlatıcı</title>
+  <meta charset="utf-8">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+</head>
+</head>
+
+<body>
+  <div >
+    <h1>Hikaye Anlatıcı Sayfası</h1>
+  </div>
+  <div id="Characters">
+  </div>
+  <script src="/htmlCodes/player.js"></script>
+  <script src="/htmlCodes/jquery-3.2.1.js"></script>
+  <script>
+    var players;
+    var i = 0;
+    players.forEach(function(player) {
+      $("#Characters").append('<div name="abilities'+i+'"><li id="characterName">Karakterin ismi:'+player.character+'</li><li id="playerName">Oyuncunun ismi:'+player.playerName+'</li><li id="character_type">karakter türü:'+player.characterType+'</li><br><li>Yetenekler:</li><br><ol id=0>atak(yakın):'+player.abilities[0]+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol><ol id=1>atak(uzak):'+player.abilities[1]+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol><ol id=2>defans:'+player.abilities[2]+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol><ol id=3>hız:'+player.abilities[3]+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol><ol id=4>kaçınma (dodge):'+player.abilities[4]+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol><ol id=5>ikna:'+player.abilities[5]+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol><ol id=6>araştırma:'+player.abilities[6]+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol><ol id=7>gizlenme:'+player.abilities[7]+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol><ol id=8>tedavi etme:'+player.abilities[8]+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol><ol id="health">Can:'+player.health+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol><ol id="sanity">Akıl sağlığı:'+player.sanity+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol><ol id="money">Para:'+player.money+'<button class="plus"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button><button class="minus"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button></ol></div>')
+      i++;
+    })
+    for(var j = 0; j < i;j++){
+      var leftvalue = j*15;
+      $("div[name='abilities"+j+"']").css({"background-color":random_bg_color,"position":"absolute","left":leftvalue+"%"})
+    }
+
+    function random_bg_color() {
+    var x = Math.floor(Math.random() * 100)+156;
+    var y = Math.floor(Math.random() * 100)+156;
+    var z = Math.floor(Math.random() * 100)+156;
+    return "rgb(" + x + "," + y + "," + z + ")";
+    }
+
+    $(".plus").click(function(){
+      window.alert("plus")
+    })
+    $(".minus").click(function(){
+      window.alert("minus")
+    })
+  </script>
+</body>
+
 </html>
