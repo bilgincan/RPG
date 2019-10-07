@@ -58,6 +58,19 @@ public class Admin{
         a.setSanity(a.getSanity()+plusSanity);
     }
 
+    public void setMoney(int money, Player player){
+      Character a = player.getCharacter();
+      a.setMoney(money);
+    }
+    public void setHealth(int health,Player player){
+      Character a = player.getCharacter();
+      a.setHealth(health);
+    }
+    public void setSanity(int sanity,Player player){
+      Character a = player.getCharacter();
+      a.setSanity(sanity);
+    }
+
     public void setAbilities(double[] abilities, Player player){
         player.getCharacter().setAbilities(abilities);
     }

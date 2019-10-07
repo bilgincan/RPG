@@ -56,17 +56,17 @@ public class Villian{
         }
     }
 
-    public void closeAttack(Character target){
+    public void closeAttack(Character target) throws Exception{
         double attackpoints = this.character.attack(true);
-        System.out.println("Düşman "+attackpoints+" vuruş yaptı.");
+        GameServer.logWriter("Düşman "+attackpoints+" vuruş yaptı.");
         target.defence(attackpoints);
-        System.out.println(target.getCharacterName()+"ın "+target.getHealth()+" canı kaldı.");
+        GameServer.logWriter(target.getCharacterName()+"ın "+target.getHealth()+" canı kaldı.");
     }
 
-    public void wideAttack(Character target){
+    public void wideAttack(Character target) throws Exception{
         double attackpoints = this.character.attack(false);
-        System.out.println("Düşman "+attackpoints+" vuruş yaptı.");
+        GameServer.logWriter("Düşman "+attackpoints+" vuruş yaptı.");
         target.defence(attackpoints);
-        System.out.println(target.getCharacterName()+"ın "+target.getHealth()+" canı kaldı.");
+        GameServer.logWriter(target.getCharacterName()+"ın "+target.getHealth()+" canı kaldı.");
     }
 }

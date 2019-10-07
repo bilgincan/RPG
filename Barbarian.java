@@ -9,8 +9,7 @@ public class Barbarian extends Character{
 
     public void talk(){
         if(timesTalked == 5){
-            rollDice();
-            int sanity = this.getSanity()-this.dice;
+            int sanity = this.getSanity()-rollDice();
             this.setSanity(sanity);
         }
         timesTalked = (timesTalked+1)%6;

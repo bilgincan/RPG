@@ -9,3 +9,17 @@ class player{
       this.health = health;
     }
 }
+
+class villian{
+    constructor(characterType,health){
+      this.characterType = characterType;
+      this.health = health;
+    }
+}
+
+function reload(loadtime){
+    setTimeout(function(){
+        window.location.reload()
+    },loadtime)
+
+}

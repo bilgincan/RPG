@@ -90,11 +90,6 @@ public class Player{
     public double sneak(){
         return this.character.sneak();
     }
-
-    public static int rollDice(){
-        return (int) (Math.random()*10+1);
-    }
-
     public double heal(){
         return this.character.heal();
     }
@@ -106,7 +101,7 @@ public class Player{
     public String toString(){
         return this.playerName;
     }
-
-
-
+    public static int rollDice(){
+      return Character.rollDice();
+    }
 }

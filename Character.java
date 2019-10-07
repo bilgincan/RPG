@@ -8,11 +8,10 @@ public abstract class Character{
     private int money;
     protected List<Item> items;
     private List<Item> wornItems;
-    protected int dice;
     private double[] effectiveAbilities;
 
-    protected void rollDice(){
-        this.dice = (int) (Math.random() * 20+1);
+    public static int rollDice(){
+        return (int) (Math.random() * 20+1);
     }
 
     public Character(int health, int sanity, int closeDamage, int wideDamage, int defence, int speed, int dodge, int persuasive, int investigation, int sneak,int abilityOfHeal,String CharacterName, Player User,int money){
@@ -99,24 +98,21 @@ public abstract class Character{
     //functions depends on rolling dice
     // b == true close attack b == false wideAttack
     public double attack(boolean b){
-        rollDice();
         if(b){
-            return effectiveAbilities[0]*dice;
+            return effectiveAbilities[0]*rollDice();
         }
-            return effectiveAbilities[1]*dice;
+            return effectiveAbilities[1]*rollDice();
     }
 
     //attackpoints is the damage of the attacking character
     public double defence(double attackpoints){
       try {
-        rollDice();
         int dodged = (int) this.dodgeAttack();
-        if(dodged > 50){
+        if(attackpoints < 75 && dodged > 50){
             GameServer.logWriter(this.CharacterName+" saldırıyı savuşturdu, çatışmadan hasar almadan çıktı.");
             return 0;
         }
-        rollDice();
-        double defence = attackpoints - (effectiveAbilities[2]*dice/2);
+        double defence = attackpoints - (effectiveAbilities[2]*(rollDice()/4));
         if(defence <= 0){
             GameServer.logWriter(this.CharacterName+" saldırıdan hiç hasar almadan çıktı.");
             return 0;
@@ -136,31 +132,26 @@ public abstract class Character{
 
     //dodgeAttack is a hepling method for defence
     private double dodgeAttack(){
-        return (effectiveAbilities[3]*dice+(effectiveAbilities[4]*dice)/2);
+        return (effectiveAbilities[3]*rollDice()+(effectiveAbilities[4]*rollDice())/2);
     }
 
     public double investigate(){
-        rollDice();
-        return effectiveAbilities[6]*dice;
+        return effectiveAbilities[6]*rollDice();
     }
 
     public double run(){
-      rollDice();
-      return effectiveAbilities[3]*dice;
+      return effectiveAbilities[3]*rollDice();
     }
     public double sneak(){
-        rollDice();
-        return effectiveAbilities[7]*dice;
+        return effectiveAbilities[7]*rollDice();
     }
 
     public double heal(){
-        rollDice();
-        return effectiveAbilities[8]*dice;
+        return effectiveAbilities[8]*rollDice();
     }
 
     public double convince(){
-        rollDice();
-        return effectiveAbilities[5]*dice;
+        return effectiveAbilities[5]*rollDice();
     }
 
     //functions about items

@@ -5,7 +5,6 @@ public class Wolfman extends Character{
     }
 
     public void alone(){
-        rollDice();
-        this.setSanity(this.getSanity()-dice);
+        this.setSanity(this.getSanity()-rollDice());
     }
 }
