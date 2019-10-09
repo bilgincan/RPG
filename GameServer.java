@@ -582,7 +582,7 @@ public class GameServer{
     }
   }
     public static void main(String[] a) throws IOException{
-        GameServer server = new GameServer(8080);
+        GameServer server = new GameServer(80);
         while(true)
         server.run();
     }
