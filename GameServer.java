@@ -4,9 +4,9 @@ import java.util.*;
 
 public class GameServer{
     private final ServerSocket server;
-    private static final String homePage = "../htmlCodes/index.html";
-    private static final String player_page = "../htmlCodes/player.html";
-    private static final String adminPage = "../htmlCodes/admin.html";
+    private static final String homePage = "htmlCodes/index.html";
+    private static final String player_page = "htmlCodes/player.html";
+    private static final String adminPage = "htmlCodes/admin.html";
     private Admin admin = null;
     private Socket socket;
 
@@ -40,7 +40,7 @@ public class GameServer{
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             //for getting inputs from the user
             String input = in.readLine();
-
+            System.out.println(input);
             if(input.equals("GET / HTTP/1.1")){
             printHTMLPage(homePage);
         }
@@ -110,11 +110,11 @@ public class GameServer{
                 String[] parts = input.split("/");
                 String file = parts[2];
                 if(file.contains("bootstrap")){
-                  printHTMLPage("../htmlCodes/bootstrap/bootstrap-3.4.1-dist/css/bootstrap.min.css");
+                  printHTMLPage("htmlCodes/bootstrap/bootstrap-3.4.1-dist/css/bootstrap.min.css");
                   return;
                 }
                 parts = file.split(" ");
-                file = "../htmlCodes/";
+                file = "htmlCodes/";
                 file += parts[0];
                 printHTMLPage(file);
             }
@@ -561,28 +561,28 @@ public class GameServer{
     }
     public static void logWriter(String log)throws IOException {
     controlSizeOfLogFile();
-    BufferedWriter writer = new BufferedWriter(new FileWriter("../htmlCodes/log.txt", true));
+    BufferedWriter writer = new BufferedWriter(new FileWriter("htmlCodes/log.txt", true));
     writer.append("<br>\n");
     writer.append(">"+log);
     writer.close();
     }
     private static void controlSizeOfLogFile()throws IOException{
     int line = 0;
-    BufferedReader reader = new BufferedReader(new FileReader("../htmlCodes/log.txt"));
+    BufferedReader reader = new BufferedReader(new FileReader("htmlCodes/log.txt"));
     while(reader.ready()){
       line++;
       reader.readLine();
     }
     reader.close();
     if(line > 25){
-      BufferedWriter writer = new BufferedWriter(new FileWriter("../htmlCodes/log.txt", false));
+      BufferedWriter writer = new BufferedWriter(new FileWriter("htmlCodes/log.txt", false));
       writer.write("");
       writer.flush();
       writer.close();
     }
   }
     public static void main(String[] a) throws IOException{
-        GameServer server = new GameServer(80);
+        GameServer server = new GameServer(5000);
         while(true)
         server.run();
     }
