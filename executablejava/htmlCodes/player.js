@@ -16,10 +16,47 @@ class villian{
       this.health = health;
     }
 }
-
 function reload(loadtime){
     setTimeout(function(){
         window.location.reload()
     },loadtime)
+}
 
+function printTurkishLetters(characterName){
+
+//make the turkish letters visiable
+while(characterName.includes("%20")){
+  characterName = characterName.replace("%20"," ");
+}
+while(characterName.includes("%C5%9F")){
+  characterName = characterName.replace("%C5%9F","ş");
+}
+while(characterName.includes("%C3%BC")){
+  characterName = characterName.replace("%C3%BC","ü");
+}
+while(characterName.includes("%C3%A7")){
+  characterName = characterName.replace("%C3%A7","ç");
+}
+while(characterName.includes("%C4%9F")){
+  characterName = characterName.replace("%C4%9F","ğ");
+}
+while(characterName.includes("%C4%B0")){
+  characterName = characterName.replace("%C4%B0","İ");
+}
+while(characterName.includes("%C3%9C")){
+  characterName = characterName.replace("%C3%9C","Ü");
+}
+while(characterName.includes("%C4%B1")){
+  characterName = characterName.replace("%C4%B1","ı");
+}
+while(characterName.includes("%C5%9E")){
+  characterName = characterName.replace("%C5%9E","Ş");
+}
+while(characterName.includes("%C4%9E")){
+  characterName = characterName.replace("%C4%9E","Ğ");
+}
+while(characterName.includes("%C3%87")){
+  characterName = characterName.replace("%C3%87","Ç");
+}
+return characterName;
 }

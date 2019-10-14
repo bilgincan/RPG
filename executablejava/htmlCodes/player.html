@@ -25,6 +25,14 @@
     </font>
     </div>
 
+    <div id="otherPlayers">
+        <h2>Yoldaşlar:</h2>
+        <font size="+2">
+        <ul id="otherPlayers_list">
+        </ul>
+    </font>
+    </div>
+
     <div>
     <ul class="abilities">
         <font size="+1">
@@ -43,6 +51,7 @@
     </ul>
       <button type="button" class="btn btn-primary btn-lg" id="rollDiceButton">Zar At!</button>
     </div>
+    <div id="eventsSection">
     <div id="eventsInStory">
       <h4>Olaylar:</h4>
       <font size="+0.5">
@@ -50,7 +59,14 @@
         </div>
         </font>
     </div>
-
+    <div id="eventsInStoryByAdmin">
+      <h4>Hikayedeki Önemli Gelişmeler:</h4>
+      <font size="+0.5">
+        <div id="adminLog">
+        </div>
+      </font>
+    </div>
+  </div>
     <div class='items'>
         <h2 class='item_sec' id='items_title'>Eşyalar:</h2>
         <ul id='item_list'>
@@ -81,7 +97,7 @@
     </div>
     </div>
 
-
+    <script src="/htmlCodes/jquery-3.2.1.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="/htmlCodes/player.js"></script>
     <script>
@@ -91,9 +107,11 @@
     var characterType;
     var money;
     var enemies;
+    var otherPlayers;
     var health;
     var sanity;
     var items;
+
 
     //arrays of items
     var weaponary = [["kısa kılıç","+0,5 atak",50,"ShortSword"],["uzun kılıç","+1,5 atak",125,"LongSword"],["normal balta","+0,5 atak",50,"OrdinaryAxe"],["oduncu baltası","+0,25 atak",20,"LumberjackAxe"],["savaş baltası","+1 atak",100,"BattleAxe"],["ok","+0,5 uzak mesafe atak",50,"Bow"],["arbalet","+1 uzak mesafe atak",150,"CrossBow"]]
@@ -101,24 +119,26 @@
     var shoery = [["çarık","+0,5 hız +0,5 savuşturma","",15,"Sandal"],["hafif ayakkabı","+1 hız +1 savuşturma","",30,"LightShoe"],["hafif spor ayakabbı","+1,5 hız +2 savuşturma","",75,"SportShoe"],["hafif zırhlı","+0,2 defans +0,5 hız +1 savuşturma","",50,"LightArmoredShoe"],["orta zırhlı","+0,5 defans +0,2 hız +0,5 savuşturma","",55,"MediumArmoredShoe"],["ağır zırhlı","+1 defans","",60,"HeavyShoe"]]
     var wizardian = [["asa","+1 iyileştirme","",100,"Wand"],["karizmatik gözlük","+1 ikna","",70,"Sunglasses"],["büyücü pelerini","+0,5 iyileştirme +0,5 ikna +0,5 araştırma +0,5 gizlenme","",125,"Cloak"]]
     //for the sake of the server
-    window.history.pushState("oyuncu","Oyuncu","http://localhost:5000/htmlCodes/player.html/current="+characterName)
+    window.history.pushState("oyuncu","Oyuncu","http://localhost:8080/htmlCodes/player.html/current="+characterName)
 
-
+    characterName = printTurkishLetters(characterName)
     printValues()
     printMarket()
     printItemList()
     closeMarket()
 
     $("#log").load('/htmlCodes/log.txt');
+    $("#adminLog").load("/htmlCodes/adminLog.txt");
 
     //css codes
-    $("#values_section").css({"position":"absolute","right":"15%","top":"0%"})
-    $("#enemies").css({"position":"absolute","left":"45%","top":"7%","color":"red"})
+    $("#values_section").css({"position":"absolute","left":"74%","top":"0%"})
+    $("#enemies").css({"position":"absolute","left":"45%","top":"20%","color":"red"})
+    $("#otherPlayers").css({"position":"absolute","left":"74%","top":"20%","color":"green"})
     $(".abilities").css({"position":"relative","width":"15%","top":"15%","background-color":"orange","border-radius": "7%"})
     $("#money").css({"color":"gold"})
     $("#health").css("color","green")
     $("#sanity").css("color","powderblue")
-    $(".items").css({"position":"absolute","left":"70%","top":"23%","background-color":"#329ba8","border-style": "solid", "border-radius": "5%"})
+    $(".items").css({"position":"absolute","left":"0%","top":"50%","background-color":"#329ba8","border-style": "solid", "border-radius": "2%"})
     $(".item_sec").css("color","#aaf542")
     $("#armors").css({"position":"absolute","top":"20%","left":"55%","width":"30%"})
     $("#weapons").css({"position":"absolute","top":"20%","left":"0%"})
@@ -128,7 +148,9 @@
     $("seg#price").css("color","yellow")
     $("seg#negs").css("color","#c43408")
     $(".purchase").css({"position":"absolute","left":"105%","height":"10%","width":"35%","color":"#ed1515","background-color":"#edebcc"})
-    $("#eventsInStory").css({"position":"absolute","left":"17%","top":"15%","border-style":"inset","border-width":"thick","border-color":"green"})
+    $("#eventsSection").css({"position":"absolute","left":"17%","top":"15%"})
+    $("#eventsInStory").css({"position":"relative","border-style":"inset","border-width":"thick","border-color":"green"})
+    $("#eventsInStoryByAdmin").css({"position":"relative","border-style":"inset","border-width":"thick","border-color":"green"})
     $("#rollDiceButton").css({"position":"relative","top":"150%","width":"13%"})
 
     $(".purchase").mouseenter(function(){
@@ -181,7 +203,7 @@
     })
     $("#rollDiceButton").click(function(){
       var id = $(this).attr('id');
-      $.post("rollDice")
+      $.post("rollDice"+characterName)
       reload(250)
     })
 
@@ -228,37 +250,44 @@
                 case "class Boss": $("#enemy_list").append("<li>Boss  ")
                 break
             }
-
             var enemyHealth = enemies[i][1]
-            $("#enemy_list").append(enemyHealth+"<br><button id='"+enemyName+"' name='closeAttack' class='btn btn-danger'>Yakından saldır</button>&nbsp;<button id='"+enemyName+"' name='wideAttack' class='btn btn-danger'>Uzaktan saldır</button></li>")
+            $("#enemy_list").append("HP:"+enemyHealth+"<br><button id='"+enemyName+"' name='closeAttack' class='btn btn-danger'>Yakından saldır</button>&nbsp;<button id='"+enemyName+"' name='wideAttack' class='btn btn-danger'>Uzaktan saldır</button></li>")
+        }
 
+        for(var i = 0; i < otherPlayers.length;i++){
+          if(otherPlayers[i][0].includes("%")){
+            otherPlayers[i][0] = printTurkishLetters(otherPlayers[i][0])
+          }
+          //0 ==> characterName 1 ==> health point
+          if(otherPlayers[i][0] != characterName){
+           $("#otherPlayers_list").append("<li>"+otherPlayers[i][0]+" <br> HP:"+otherPlayers[i][1]+"</li>");
+         }
         }
 
     }
 
 
     function printItemList(){
-      console.log(items)
         var item_action;
         for(var i = 0; i < items.length; i++){
           //from server I receive if it is worn or not
           if(items[i][2] == true){
-            item_action = "class='btn btn-danger' name='remove'>Eşyayı çıkar"
+            item_action = "class='btn btn-danger btn-sm' name='remove'>Eşyayı çıkar"
           }else{
-            item_action = "class='btn btn-success' name='wear'>Eşyayı giy"
+            item_action = "class='btn btn-success btn-sm' name='wear'>Eşyayı giy"
           }
             if(items[i][0] == "Weapon"){
                 for(var j = 0; j < weaponary.length; j++){
                     if(items[i][1] == "class "+weaponary[j][3]){
                       console.log(weaponary[j][3])
-                       $("#item_list").append("<ol>"+weaponary[j][0]+"<button id='"+weaponary[j][3]+"' "+item_action+"</button><button name='sell'type='button' class='btn btn-warning' id='"+weaponary[j][3]+"' >Eşyayı sat</button></ol>")
+                       $("#item_list").append(weaponary[j][0]+"<button id='"+weaponary[j][3]+"' "+item_action+"</button><button name='sell'type='button' class='btn btn-warning btn-sm' id='"+weaponary[j][3]+"' >Eşyayı sat</button><br>")
                     }
                 }
             }
             if(items[i][0] == "Armor"){
                 for(var j = 0; j < armory.length; j++){
                     if(items[i][1] == "class "+armory[j][4]){
-                       $("#item_list").append("<ol>"+armory[j][0]+"<button id='"+armory[j][4]+"'"+item_action+"</button><button name='sell' type='button' class='btn btn-warning' id='"+armory[j][4]+"' >Eşyayı sat</button></ol>")
+                       $("#item_list").append(armory[j][0]+"<button id='"+armory[j][4]+"'"+item_action+"</button><button name='sell' type='button' class='btn btn-warning btn-sm' id='"+armory[j][4]+"' >Eşyayı sat</button><br>")
                     }
                 }
 
@@ -266,7 +295,7 @@
             if(items[i][0] == "Shoe"){
                 for(var j = 0; j < shoery.length; j++){
                     if(items[i][1] == "class "+shoery[j][4]){
-                       $("#item_list").append("<ol>"+shoery[j][0]+"<button id='"+shoery[j][4]+"'"+item_action+"</button><button name='sell' type='button' class='btn btn-warning' id='"+shoery[j][4]+"' >Eşyayı sat</button></ol>")
+                       $("#item_list").append(shoery[j][0]+"<button id='"+shoery[j][4]+"'"+item_action+"</button><button name='sell' type='button' class='btn btn-warning btn-sm' id='"+shoery[j][4]+"' >Eşyayı sat</button><br>")
                     }
                 }
 
@@ -274,7 +303,7 @@
             if(items[i][0] == "Wizardish"){
                 for(var j = 0; j < wizardian.length; j++){
                     if(items[i][1] == "class "+wizardian[j][4]){
-                       $("#item_list").append("<ol>"+wizardian[j][0]+"<button id='"+wizardian[j][4]+"'"+item_action+"</button><button name='sell'type='button' class='btn btn-warning' id='"+wizardian[j][4]+"' >Eşyayı sat</button></ol>")
+                       $("#item_list").append(wizardian[j][0]+"<button id='"+wizardian[j][4]+"'"+item_action+"</button><button name='sell'type='button' class='btn btn-warning btn-sm' id='"+wizardian[j][4]+"' >Eşyayı sat</button><br>")
                     }
                 }
             }
@@ -343,12 +372,12 @@
     //this closes the market section visually
     function closeMarket(){
       $(".products").hide()
-      $(".items").css({"left":"70%","height":"30%","width":"23%"})
+      $(".items").css({"left":"0%","height":"30%","width":"17%"})
     }
     $("button#closeMarket").click(function(){
       if(marketClosed == true){
         marketClosed = false;
-        $(".items").css({"left":"40%","height":"150%","width":"60%"})
+        $(".items").css({"left":"0%","height":"150%","width":"60%"})
         $(".products").show()
       }else{
         marketClosed = true;

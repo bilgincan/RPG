@@ -13,7 +13,7 @@
   </div>
   <div id="Characters">
   </div>
-  <h4 align="center" id="enemyGeneratorTitle">Düşman Yarat</h4>
+  <h4 id="enemyGeneratorTitle">Düşman Yarat</h4>
   <div id="enemyGenerator" class="btn-group mr-2" role="group" aria-label="First group">
     <button type="button" class="btn btn-primary" id="Boss" name="enemyGenerate">Boss</button>
     <button type="button" class="btn btn-primary" id="Knight" name="enemyGenerate">Şovalye</button>
@@ -23,8 +23,14 @@
     <button type="button" class="btn btn-primary" id="BlackSmith" name="enemyGenerate">Demirci</button>
     <button type="button" class="btn btn-primary" id="Barbarian" name="enemyGenerate">Barbar</button>
   </div>
+
+  <button id="rollDice" type="button" class="btn btn-secondary btn-lg">Zar At!</button>
+  <button type="button" class="btn btn-danger btn-lg" id="reset">Hikayeyi Sıfırla</button>
+
   <div id="enemies">
   </div>
+
+  <div id="eventsSection">
   <div id="eventsInStory">
     <h4>Olaylar:</h4>
     <font size="+0.5">
@@ -32,15 +38,32 @@
       </div>
       </font>
   </div>
+  <div id="eventsInStoryByAdmin">
+    <h4>Hikayedeki Önemli Gelişmeler:</h4>
+    <font size="+0.5">
+      <div id="adminLog">
+      </div>
+      <button id='updateStory'>Güncelle</button>
+    </font>
+  </div>
+</div>
+
   <script src="/htmlCodes/player.js"></script>
+  <script src="/htmlCodes/jquery-3.2.1.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script>
-    $("#log").load('../htmlCodes/log.txt');
-    $("#eventsInStory").css({"position":"absolute","top":"85%","border-style":"inset","border-width":"thick","border-color":"green","height":"14%","overflow":"scroll"})
+    $("#log").load('/htmlCodes/log.txt');
+    $("#adminLog").load("/htmlCodes/adminLog.txt");
 
     $("#enemyGenerator").css({"position":"absolute","bottom":"10%","left":"35%"})
     $("#enemies").css({"position":"absolute","bottom":"5%","left":"70%"})
     $("#enemyGeneratorTitle").css({"position":"absolute","bottom":"15%","left":"45%"})
+    $("#reset").css({"position":"fixed","bottom":"0%","left":"45%"})
+    $("#rollDice").css({"position":"fixed","bottom":"5%","left":"46.5%"})
+  // $("#eventsSection").css({"position":"absolute","top":"90%"})
+    $("#eventsInStory").css({"position":"absolute","top":"90%","height":"14%","overflow":"scroll","border-style":"inset","border-width":"thick","border-color":"green"})
+    $("#eventsInStoryByAdmin").css({"position":"absolute","top":"104%","height":"35%","border-style":"inset","border-width":"thick","border-color":"green"})
+
 
     var players;
     var villians;
@@ -48,7 +71,9 @@
 
     var i = 0;
     players.forEach(function(player) {
-      $("#Characters").append('<div name="abilities'+i+'"> <li id="characterName">Karakterin ismi:'+player.character+'</li> <li id="playerName">Oyuncunun ismi:'+player.playerName+'</li> <li id="character_type">karakter türü:'+player.characterType+'</li><li>Yetenekler:</li><ol id=0>atak(yakın):<input type="number" value='+player.abilities[0]+'></ol> <ol id=1>atak(uzak):<input type="number" value='+player.abilities[1]+'></ol> <ol id=2>defans:<input type="number" value='+player.abilities[2]+' /></button></ol> <ol id=3>hız:<input type="number" value='+player.abilities[3]+' /></button></ol> <ol id=4>kaçınma (dodge):<input type="number" value='+player.abilities[4]+' /></button> </ol> <ol id=5>ikna:<input type="number" value='+player.abilities[5]+' /></ol> <ol id=6>araştırma:<input type="number" value='+player.abilities[6]+' /></ol> <ol id=7>gizlenme:<input type="number" value='+player.abilities[7]+' /></ol> <ol id=8>tedavi etme:<input type="number" value='+player.abilities[8]+' /></ol> <ol id="health">Can:<input type="number" value='+player.health+' /></ol> <ol id="sanity">Akıl sağlığı:<input type="number" value='+player.sanity+' /></ol> <ol id="money">Para:<input type="number" value='+player.money+' /></ol><button align="center" type="submit" name="updatePlayer" id="'+player.playerName+'">Güncelle</button> </div>')
+      player.character = printTurkishLetters(player.character);
+      player.playerName = printTurkishLetters(player.playerName);
+      $("#Characters").append('<div name="abilities'+i+'"> <li id="characterName">Karakterin ismi:'+player.character+'</li> <li id="playerName">Oyuncunun ismi:'+player.playerName+'</li> <li id="character_type">karakter türü:'+player.characterType+'</li><li>Yetenekler:</li><ol id=0>atak(yakın):<input type="number" value='+player.abilities[0]+'></ol> <ol id=1>atak(uzak):<input type="number" value='+player.abilities[1]+'></ol> <ol id=2>defans:<input type="number" value='+player.abilities[2]+' /></button></ol> <ol id=3>hız:<input type="number" value='+player.abilities[3]+' /></button></ol> <ol id=4>kaçınma (dodge):<input type="number" value='+player.abilities[4]+' /></button> </ol> <ol id=5>ikna:<input type="number" value='+player.abilities[5]+' /></ol> <ol id=6>araştırma:<input type="number" value='+player.abilities[6]+' /></ol> <ol id=7>gizlenme:<input type="number" value='+player.abilities[7]+' /></ol> <ol id=8>tedavi etme:<input type="number" value='+player.abilities[8]+' /></ol> <ol id="health">Can:<input type="number" value='+player.health+' /></ol> <ol id="sanity">Akıl sağlığı:<input type="number" value='+player.sanity+' /></ol> <ol id="money">Para:<input type="number" value='+player.money+' /></ol><button align="center" type="submit" name="updatePlayer" id="'+player.playerName+'">Güncelle</button><button align="center" type="submit" name="deletePlayer" id="'+player.playerName+'">Oyuncuyu Sil</button>  </div>')
       i++;
       targetOptionsForEnemy = targetOptionsForEnemy.concat("<option>"+player.character+"</option>");
     })
@@ -59,7 +84,7 @@
     if(villians.length>0){
       $("#enemies").append("<h4>Düşmanlar:</h4>")
       villians.forEach(function(villian){
-        $("#enemies").append('<ul><li class="enemy">'+villian.characterType+' '+villian.health+' <select id="target" class="mdb-select md-form"><option value="" disabled selected>Hedef Seçiniz</option>'+targetOptionsForEnemy+'</select><button type="button" class="btn btn-danger" id="'+villian.characterType+'" name="attack">Saldır</button></li></ul>')
+        $("#enemies").append('<ul><li class="enemy">'+villian.characterType+' '+villian.health+' <select id="target" class="mdb-select md-form"><option value="" disabled selected>Hedef Seçiniz</option>'+targetOptionsForEnemy+'</select><button type="button" class="btn btn-danger" id="'+villian.characterType+'" name="attack">Saldır</button><button type="button" class="btn btn-danger" id="'+villian.characterType+'" name="removeEnemy">Düşmanı kaldır</button></li></ul>')
       })
     }
     $(".enemy").css("color","darkblue")
@@ -104,9 +129,35 @@
       $.post("abilities="+abilities+" "+"playerName="+player)
       reload(250)
     })
-
+    $("button[name='deletePlayer']").click(function(){
+      if(window.confirm("Bu oyuncuyu silmek istediğnize emin misiniz?")){
+      var player = $(this).attr('id');
+      $.post("deletePlayer="+player)
+      reload(250)
+    }
+    })
+    $("button[name='removeEnemy']").click(function(){
+      if(window.confirm("Bu düşmanı silmek istediğinize emin misiniz?")){
+        var enemy = $(this).attr('id');
+        $.post("deleteEnemy="+enemy);
+        reload(250)
+      }
+    })
+    $("button#reset").click(function(){
+      if(window.confirm("Tüm hikayeyi sıfırlamak istediğinize emin misiniz?")){
+        $.post("adminreset")
+        reload(250)
+      }
+    })
+    $("button#rollDice").click(function(){
+      $.post("rollDiceAdmin")
+      reload(250)
+    })
+    $("button#updateStory").click(function(){
+        $.post("newAdminLog="+$("textarea").val())
+        reload(250)
+    })
     reload(60000)
-  </script>
+    </script>
 </body>
-
 </html>

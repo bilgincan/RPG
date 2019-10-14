@@ -1,9 +1,8 @@
-
 <br>
->Rastgele zar atıldı: 19<br>
->faezxc 0 puan ile iyileştirme yeteneğini kullandı.<br>
->fasdfasdf 0 puan ile iyileştirme yeteneğini kullandı.<br>
->fasdfasdf 18 puan ile ikna kabiliyetini kullandı.<br>
->fasdfasdf 98 puan ile depara kalktı<br>
->Düşman 90.0 vuruş yaptı.<br>
->fasdfasdfın 68 canı kaldı.
+>Düşman saldırıyı savuşturdu, çatışmadan hasar almadan çıktı.<br>
+>Düşmanın 120 canı kaldı.<br>
+>c 36.0 vuruş yaptı<br>
+>Düşman saldırıyı savuşturdu, çatışmadan hasar almadan çıktı.<br>
+>Düşmanın 120 canı kaldı.<br>
+>c 102.0 vuruş yaptı<br>
+>Düşmanın 18 canı kaldı.

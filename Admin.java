@@ -33,6 +33,13 @@ public class Admin{
         return null;
     }
 
+    public Villian getVillianByCharacterName(String name){
+      for(Villian v: this.villians){
+            if(v.getCharacter().getClass().toString().equals(name))
+                return v;
+        }
+        return null;
+    }
     public Character getCharacterByName(String name){
         for(Player p: this.players){
             // System.out.println(p.getCharacter().getCharacterName());
@@ -108,6 +115,13 @@ public class Admin{
         return null;
     }
 
+    public void removePlayer(Player player){
+      this.players.remove(player);
+    }
+
+    public void removeVillian(Villian villian){
+      this.villians.remove(villian);
+    }
     //resets characters and villians
     public void resetStory(){
         this.players = new ArrayList<Player>();

@@ -37,7 +37,7 @@ public class GameServer{
         this.socket = socket;
 
         try{
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(),"UTF8"));
             //for getting inputs from the user
             String input = in.readLine();
             System.out.println(input);
@@ -50,8 +50,19 @@ public class GameServer{
 
             prepareAdminPage();
         }
-        else if(input.contains("rollDice")){
-          logWriter("Rastgele zar atıldı: "+Character.rollDice());
+        if(input.contains("newAdminLog=")){
+          String parts[] = input.split("newAdminLog=");
+          String log = parts[1].split(" HTTP")[0];
+          writeIntoAdminLog(log);
+        }
+        if(input.contains("rollDice")){
+          String[] parts = input.split("rollDice");
+          String characterName = parts[1].split(" HTTP")[0];
+          logWriter("Rastgele zar atıldı: "+Character.rollDice()+ " ("+characterName+")");
+        }
+        else if (input.contains("adminreset")) {
+          this.admin.resetStory();
+          deleteContentOfLogFile();
         }
         else if(this.admin == null){
           System.out.println("Admin oluşturulmalı Admin olmak için lütfen [domainName]/Admin adresine giriş yapın");
@@ -102,7 +113,16 @@ public class GameServer{
           String player = parts[1].split("playerName=")[1];
           player = player.split(" HTTP")[0];
           setAbilities(abilities,player);
-
+        }
+        else if(input.contains("deletePlayer=")){
+          String parts[] = input.split("deletePlayer=");
+          String player = parts[1].split(" HTTP")[0];
+          removePlayer(player);
+        }
+        else if(input.contains("deleteEnemy=")){
+          String parts[] = input.split("deleteEnemy=");
+          String villian = parts[1].split(" HTTP")[0];
+          removeVillian(villian);
         }
 
         //load html files by names
@@ -199,6 +219,14 @@ public class GameServer{
                 if(i < enemies.size()-1)
                     jsCode += " , ";
             }
+            jsCode += "]; var otherPlayers = [";
+            List<Player> players = this.admin.getPlayers();
+            for(int i = 0; i < players.size(); i++){
+              Character enChar = players.get(i).getCharacter();
+              jsCode += "['"+enChar.getCharacterName()+"',"+enChar.getHealth()+"]";
+              if( i< players.size()-1)
+                  jsCode += " , ";
+            }
             jsCode += "];";
 
             jsCode += "var items = [";
@@ -265,7 +293,7 @@ public class GameServer{
     private void printHTMLPage(String page,String jsCodes){
         try{
         PrintStream out = new PrintStream(socket.getOutputStream());
-        BufferedReader htmlCode = new BufferedReader(new FileReader(page));
+        BufferedReader htmlCode = new BufferedReader(new InputStreamReader(new FileInputStream(page),"UTF8"));
 
         //content is the content of the html file
         String content = "";
@@ -290,7 +318,7 @@ public class GameServer{
         }
         htmlCode.close();
 
-        out.println("HTTP/1.1 \nContent-Type: text/html\n\r\n");
+        out.println("HTTP/1.1 200 OK\nContent-Type: text/html\n\r\n");
         out.println(content);
     }catch(Exception e){
         e.printStackTrace();
@@ -302,7 +330,7 @@ public class GameServer{
         try{
 
         PrintStream out = new PrintStream(socket.getOutputStream());
-        BufferedReader htmlCode = new BufferedReader(new FileReader(page));
+        BufferedReader htmlCode = new BufferedReader(new InputStreamReader(new FileInputStream(page),"UTF8"));
 
         //content is the content of the html file
         String content = "";
@@ -314,7 +342,7 @@ public class GameServer{
 
         htmlCode.close();
 
-        out.println("HTTP/1.1 \nContent-Type: text/html\n\r\n");
+        out.println("HTTP/1.1 200 OK\nContent-Type: text/html\n\r\n");
         out.println(content);
         out.flush();
     }catch(Exception e){
@@ -561,28 +589,83 @@ public class GameServer{
     }
     public static void logWriter(String log)throws IOException {
     controlSizeOfLogFile();
-    BufferedWriter writer = new BufferedWriter(new FileWriter("htmlCodes/log.txt", true));
+    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("htmlCodes/log.txt", true),"UTF8"));
     writer.append("<br>\n");
     writer.append(">"+log);
     writer.close();
     }
     private static void controlSizeOfLogFile()throws IOException{
     int line = 0;
-    BufferedReader reader = new BufferedReader(new FileReader("htmlCodes/log.txt"));
+    BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("htmlCodes/log.txt"),"UTF8"));
     while(reader.ready()){
       line++;
       reader.readLine();
     }
     reader.close();
     if(line > 25){
-      BufferedWriter writer = new BufferedWriter(new FileWriter("htmlCodes/log.txt", false));
-      writer.write("");
-      writer.flush();
-      writer.close();
+      deleteContentOfLogFile();
     }
   }
+  private static void deleteContentOfLogFile() throws IOException{
+    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("htmlCodes/log.txt", false),"UTF8"));
+    writer.write("");
+    writer.flush();
+    writer.close();
+  }
+  private static void writeIntoAdminLog(String log) throws IOException{
+    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter (new FileOutputStream("htmlCodes/adminLog.txt", false),"UTF8"));
+    log = writeMissingTurkishChars(log);
+    writer.write("<textarea rows='10'>"+log+"</textarea>");
+    writer.flush();
+    writer.close();
+  }
+  public static String writeMissingTurkishChars(String input){
+    if(input.contains("%20")){
+      input = input.replace("%20"," ");
+    }
+    if(input.contains("%C5%9F")){
+      input = input.replace("%C5%9F","ş");
+    }
+    if(input.contains("%C3%BC")){
+      input = input.replace("%C3%BC","ü");
+    }
+    if(input.contains("%C3%A7")){
+      input = input.replace("%C3%A7","ç");
+    }
+    if(input.contains("%C4%9F")){
+      input = input.replace("%C4%9F","ğ");
+    }
+    if(input.contains("%C4%B0")){
+      input = input.replace("%C4%B0","İ");
+    }
+    if(input.contains("%C3%9C")){
+      input = input.replace("%C3%9C","Ü");
+    }
+    if(input.contains("%C4%B1")){
+      input = input.replace("%C4%B1","ı");
+    }
+    if(input.contains("%C5%9E")){
+      input = input.replace("%C5%9E","Ş");
+    }
+    if(input.contains("%C4%9E")){
+      input = input.replace("%C4%9E","Ğ");
+    }
+    if(input.contains("%C3%87")){
+      input = input.replace("%C3%87","Ç");
+    }
+    return input;
+  }
+  private void removePlayer(String player){
+    Player p = this.admin.getPlayerByName(player);
+    this.admin.removePlayer(p);
+  }
+  private void removeVillian(String villian){
+    System.out.println(villian);
+    Villian v = this.admin.getVillianByCharacterName(villian);
+    this.admin.removeVillian(v);
+  }
     public static void main(String[] a) throws IOException{
-        GameServer server = new GameServer(5000);
+        GameServer server = new GameServer(8080);
         while(true)
         server.run();
     }
