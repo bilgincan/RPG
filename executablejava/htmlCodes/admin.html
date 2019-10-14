@@ -43,7 +43,7 @@
     <font size="+0.5">
       <div id="adminLog">
       </div>
-      <button id='updateStory'>Güncelle</button>
+      <button id='updateStory' class="btn btn-success">Güncelle</button>
     </font>
   </div>
 </div>
@@ -63,6 +63,7 @@
   // $("#eventsSection").css({"position":"absolute","top":"90%"})
     $("#eventsInStory").css({"position":"absolute","top":"90%","height":"14%","overflow":"scroll","border-style":"inset","border-width":"thick","border-color":"green"})
     $("#eventsInStoryByAdmin").css({"position":"absolute","top":"104%","height":"35%","border-style":"inset","border-width":"thick","border-color":"green"})
+    $("button#updateStory").css({"position":"absolute","left":"37%"})
 
 
     var players;
@@ -113,6 +114,10 @@
       if(target == "Hedef Seçiniz"){
         window.alert("Lütfen önce bir hedef seçiniz!!!!!!")
       }else{
+        while(target.includes("Hedef Seçiniz")){
+          target = target.replace("Hedef Seçiniz","");
+        }
+        console.log("target: "+target)
         $.post("closeattack="+villian+" "+target+" false")
         reload(250)
       }

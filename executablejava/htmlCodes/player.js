@@ -60,3 +60,10 @@ while(characterName.includes("%C3%87")){
 }
 return characterName;
 }
+
+function loading(){
+  $("#loading").show()
+  setTimeout(function(){
+      $("#loading").hide()
+  },1000)
+}

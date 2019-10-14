@@ -121,16 +121,24 @@ public class GameServer{
         }
         else if(input.contains("deleteEnemy=")){
           String parts[] = input.split("deleteEnemy=");
-          String villian = parts[1].split(" HTTP")[0];
+          parts = parts[1].split(" HTTP");
+          String villian = parts[0].split("%20")[1];
           removeVillian(villian);
+        }
+        else if(input.contains("newPlayerLog=")){
+          String parts[] = input.split("newPlayerLog=");
+          String log = parts[1].split(" HTTP")[0];
+          String characterName = parts[0].split("character=")[1];
+          writeIntoPlayerLog(log, characterName);
         }
 
         //load html files by names
         if(input.contains("GET /htmlCodes/") && !input.contains("player.html")){
                 String[] parts = input.split("/");
                 String file = parts[2];
-                if(file.contains("bootstrap")){
-                  printHTMLPage("htmlCodes/bootstrap/bootstrap-3.4.1-dist/css/bootstrap.min.css");
+                if(file.contains("playerLogs")){
+                  String characterLog = parts[3].split(" HTTP")[0];
+                  printHTMLPage("htmlCodes/playerLogs/"+characterLog);
                   return;
                 }
                 parts = file.split(" ");
@@ -167,6 +175,7 @@ public class GameServer{
                 //if the character can be initiazed load the character page
                 if(initializePlayer(playerName,characterName,character)){
                     defineAbilitiesForJS(characterName,player_page);
+                    createLogFileForPlayer(characterName);
                 }
                 else{
                     printHTMLPage(homePage);
@@ -589,6 +598,7 @@ public class GameServer{
     }
     public static void logWriter(String log)throws IOException {
     controlSizeOfLogFile();
+    log = writeMissingTurkishChars(log);
     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("htmlCodes/log.txt", true),"UTF8"));
     writer.append("<br>\n");
     writer.append(">"+log);
@@ -613,7 +623,13 @@ public class GameServer{
     writer.close();
   }
   private static void writeIntoAdminLog(String log) throws IOException{
-    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter (new FileOutputStream("htmlCodes/adminLog.txt", false),"UTF8"));
+    writeIntoPersonalLog(log, "htmlCodes/adminLog.txt");
+  }
+  private static void writeIntoPlayerLog(String log,String characterName) throws IOException{
+    writeIntoPersonalLog(log, "htmlCodes/playerLogs/"+characterName+".txt");
+  }
+  private static void writeIntoPersonalLog(String log,String dir) throws IOException{
+    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter (new FileOutputStream(dir, false),"UTF8"));
     log = writeMissingTurkishChars(log);
     writer.write("<textarea rows='10'>"+log+"</textarea>");
     writer.flush();
@@ -655,13 +671,19 @@ public class GameServer{
     }
     return input;
   }
+  private void createLogFileForPlayer(String characterName) throws IOException{
+    File logFile = new File("htmlCodes/playerLogs/"+characterName+".txt");
+    if(logFile.createNewFile()) System.out.println("Log file for "+characterName+" has been created successfully");
+    writeIntoPersonalLog("", "htmlCodes/playerLogs/"+characterName+".txt");
+  }
   private void removePlayer(String player){
     Player p = this.admin.getPlayerByName(player);
     this.admin.removePlayer(p);
+    File logFile = new File("htmlCodes/playerLogs/"+p.getCharacter().getCharacterName()+".txt");
+    logFile.delete();
   }
   private void removeVillian(String villian){
-    System.out.println(villian);
-    Villian v = this.admin.getVillianByCharacterName(villian);
+    Villian v = this.admin.getVillianByClass(villian);
     this.admin.removeVillian(v);
   }
     public static void main(String[] a) throws IOException{

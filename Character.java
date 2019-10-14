@@ -108,11 +108,11 @@ public abstract class Character{
     public double defence(double attackpoints){
       try {
         int dodged = (int) this.dodgeAttack();
-        if(attackpoints < 75 && dodged > 50){
+        if(attackpoints < 60 && dodged > 75){
             GameServer.logWriter(this.CharacterName+" saldırıyı savuşturdu, çatışmadan hasar almadan çıktı.");
             return 0;
         }
-        double defence = attackpoints - (effectiveAbilities[2]*(rollDice()/4));
+        double defence = attackpoints - ((effectiveAbilities[2]*(rollDice())/2));
         if(defence <= 0){
             GameServer.logWriter(this.CharacterName+" saldırıdan hiç hasar almadan çıktı.");
             return 0;

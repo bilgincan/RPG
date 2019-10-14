@@ -33,9 +33,9 @@ public class Admin{
         return null;
     }
 
-    public Villian getVillianByCharacterName(String name){
+    public Villian getVillianByClass(String name){
       for(Villian v: this.villians){
-            if(v.getCharacter().getClass().toString().equals(name))
+            if(v.getCharacter().getClass().toString().equals("class "+name))
                 return v;
         }
         return null;

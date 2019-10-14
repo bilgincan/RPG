@@ -5,6 +5,40 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 <!--<link rel="stylesheet" href="../bootstrap/bootstrap-3.4.1-dist/css/bootstrap.min.css">-->
+<style>
+.lds-hourglass {
+  display: inline-block;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+.lds-hourglass:after {
+  content: " ";
+  display: block;
+  border-radius: 50%;
+  width: 0;
+  height: 0;
+  margin: 6px;
+  box-sizing: border-box;
+  border: 26px solid #000;
+  border-color: #000 transparent #000 transparent;
+  animation: lds-hourglass 1.2s infinite;
+}
+@keyframes lds-hourglass {
+  0% {
+    transform: rotate(0);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  50% {
+    transform: rotate(900deg);
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  100% {
+    transform: rotate(1800deg);
+  }
+}
+
+</style>
 </head>
 <body>
     <div>
@@ -52,20 +86,30 @@
       <button type="button" class="btn btn-primary btn-lg" id="rollDiceButton">Zar At!</button>
     </div>
     <div id="eventsSection">
-    <div id="eventsInStory">
+    <div class="logs">
       <h4>Olaylar:</h4>
       <font size="+0.5">
         <div id="log">
         </div>
         </font>
     </div>
-    <div id="eventsInStoryByAdmin">
+    <div class="logs">
       <h4>Hikayedeki Önemli Gelişmeler:</h4>
       <font size="+0.5">
         <div id="adminLog">
         </div>
       </font>
     </div>
+    <div class="logs">
+      <h4>Notlarım:</h4>
+      <font size="+0.5">
+        <div id="playerLog">
+          <!--uppl ==> Update Player Personal Log-->
+        </div>
+          <button id="uppl" class="btn btn-success">Kaydet</button>
+          <div id="loading" class="lds-hourglass"></div>
+      </font>
+  </div>
   </div>
     <div class='items'>
         <h2 class='item_sec' id='items_title'>Eşyalar:</h2>
@@ -101,6 +145,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="/htmlCodes/player.js"></script>
     <script>
+    $("#loading").hide()
     //character abilities etc. datas
     var characterName;
     var abilities;
@@ -114,7 +159,8 @@
 
 
     //arrays of items
-    var weaponary = [["kısa kılıç","+0,5 atak",50,"ShortSword"],["uzun kılıç","+1,5 atak",125,"LongSword"],["normal balta","+0,5 atak",50,"OrdinaryAxe"],["oduncu baltası","+0,25 atak",20,"LumberjackAxe"],["savaş baltası","+1 atak",100,"BattleAxe"],["ok","+0,5 uzak mesafe atak",50,"Bow"],["arbalet","+1 uzak mesafe atak",150,"CrossBow"]]
+    //['name of the item','positive effects','negative effects','price','java class']
+    var weaponary = [["kısa kılıç","+0,5 atak","",50,"ShortSword"],["uzun kılıç","+1,5 atak","",125,"LongSword"],["normal balta","+0,5 atak","",50,"OrdinaryAxe"],["oduncu baltası","+0,25 atak","",20,"LumberjackAxe"],["savaş baltası","+1 atak","",100,"BattleAxe"],["ok","+0,5 uzak mesafe atak","",50,"Bow"],["arbalet","+1 uzak mesafe atak","",150,"CrossBow"]]
     var armory = [["hafif zırh","+0,25 defans +1 savuşturma +2 hız","",50,"LightArmor"],["orta zırh","+0,5 defans +1 savuşturma +1 hız","",100,"MediumArmor"],["ağır zırh","+2 defans","-1 savuşturma -0,5 hız",150,"HeavyArmor"],["tank zırhı","+5 defans","-3 savuşturma -2 hız",150,"TankArmor"]]
     var shoery = [["çarık","+0,5 hız +0,5 savuşturma","",15,"Sandal"],["hafif ayakkabı","+1 hız +1 savuşturma","",30,"LightShoe"],["hafif spor ayakabbı","+1,5 hız +2 savuşturma","",75,"SportShoe"],["hafif zırhlı","+0,2 defans +0,5 hız +1 savuşturma","",50,"LightArmoredShoe"],["orta zırhlı","+0,5 defans +0,2 hız +0,5 savuşturma","",55,"MediumArmoredShoe"],["ağır zırhlı","+1 defans","",60,"HeavyShoe"]]
     var wizardian = [["asa","+1 iyileştirme","",100,"Wand"],["karizmatik gözlük","+1 ikna","",70,"Sunglasses"],["büyücü pelerini","+0,5 iyileştirme +0,5 ikna +0,5 araştırma +0,5 gizlenme","",125,"Cloak"]]
@@ -129,10 +175,11 @@
 
     $("#log").load('/htmlCodes/log.txt');
     $("#adminLog").load("/htmlCodes/adminLog.txt");
+    $("#playerLog").load("/htmlCodes/playerLogs/"+characterName+".txt")
 
     //css codes
     $("#values_section").css({"position":"absolute","left":"74%","top":"0%"})
-    $("#enemies").css({"position":"absolute","left":"45%","top":"20%","color":"red"})
+    $("#enemies").css({"position":"absolute","left":"47%","top":"20%","color":"red"})
     $("#otherPlayers").css({"position":"absolute","left":"74%","top":"20%","color":"green"})
     $(".abilities").css({"position":"relative","width":"15%","top":"15%","background-color":"orange","border-radius": "7%"})
     $("#money").css({"color":"gold"})
@@ -149,8 +196,7 @@
     $("seg#negs").css("color","#c43408")
     $(".purchase").css({"position":"absolute","left":"105%","height":"10%","width":"35%","color":"#ed1515","background-color":"#edebcc"})
     $("#eventsSection").css({"position":"absolute","left":"17%","top":"15%"})
-    $("#eventsInStory").css({"position":"relative","border-style":"inset","border-width":"thick","border-color":"green"})
-    $("#eventsInStoryByAdmin").css({"position":"relative","border-style":"inset","border-width":"thick","border-color":"green"})
+    $(".logs").css({"position":"relative","border-style":"inset","border-width":"thick","border-color":"green"})
     $("#rollDiceButton").css({"position":"relative","top":"150%","width":"13%"})
 
     $(".purchase").mouseenter(function(){
@@ -278,9 +324,8 @@
           }
             if(items[i][0] == "Weapon"){
                 for(var j = 0; j < weaponary.length; j++){
-                    if(items[i][1] == "class "+weaponary[j][3]){
-                      console.log(weaponary[j][3])
-                       $("#item_list").append(weaponary[j][0]+"<button id='"+weaponary[j][3]+"' "+item_action+"</button><button name='sell'type='button' class='btn btn-warning btn-sm' id='"+weaponary[j][3]+"' >Eşyayı sat</button><br>")
+                    if(items[i][1] == "class "+weaponary[j][4]){
+                       $("#item_list").append(weaponary[j][0]+"<button id='"+weaponary[j][4]+"' "+item_action+"</button><button name='sell'type='button' class='btn btn-warning btn-sm' id='"+weaponary[j][4]+"' >Eşyayı sat</button><br>")
                     }
                 }
             }
@@ -313,20 +358,33 @@
 
 
     function printMarket(){
+      //the prices are %10 discounted for the farmer, print prices with discount for the farmer
         //weaponary
         for(var i = 0; i < weaponary.length;i++){
-            $("#weaponary").append("<li style='color:$404040'>"+weaponary[i][0]+"    <seg id='adds'> "+weaponary[i][1]+"    <seg id='price'> //"+weaponary[i][2]+"<button class='purchase' id='"+weaponary[i][3]+"'>Satın al</button></li><br>")
+          if(characterType == "class Farmer"){
+            weaponary[i][3] = weaponary[i][3] * 0.9
+          }
+            $("#weaponary").append("<li style='color:$404040'>"+weaponary[i][0]+"    <seg id='adds'> "+weaponary[i][1]+"    <seg id='negs'> "+weaponary[i][2]+"<seg id='price'>//"+weaponary[i][3]+"</seg><button class='purchase' id='"+weaponary[i][4]+"'>Satın al</button></li><br>")
         }
 
         for(var i = 0; i < armory.length; i++){
+          if(characterType == "class Farmer"){
+            armory[i][3] = armory[i][3] * 0.9
+          }
             $("#armory").append("<li style='color:$404040'>"+ armory[i][0]+"    <seg id='adds'> "+armory[i][1]+"    <seg id='negs'> "+armory[i][2]+"    <seg id='price'> //"+armory[i][3]+"<button class='purchase' id='"+armory[i][4]+"'>Satın al</button></li><br>")
         }
 
         for(var i = 0; i < shoery.length; i++){
+          if(characterType == "class Farmer"){
+            shoery[i][3] = shoery[i][3] * 0.9
+          }
             $("#shoery").append("<li style='color:$404040'>"+ shoery[i][0]+"    <seg id='adds'> "+shoery[i][1]+"    <seg id='negs'> "+shoery[i][2]+"    <seg id='price'> //"+shoery[i][3]+"<button class='purchase' id='"+shoery[i][4]+"'>Satın al</button></li><br>")
         }
 
         for(var i = 0; i < wizardian.length; i++){
+          if(characterType == "class Farmer"){
+            wizardian[i][3] = wizardian[i][3] * 0.9
+          }
             $("#wizardian").append("<li style='color:$404040'>"+ wizardian[i][0]+"    <seg id='adds'> "+wizardian[i][1]+"    <seg id='negs'> "+wizardian[i][2]+"    <seg id='price'> //"+wizardian[i][3]+"<button class='purchase' id='"+wizardian[i][4]+"'>Satın al</button></li><br>")
         }
     }
@@ -384,11 +442,14 @@
         closeMarket()
       }
     })
+    $("#uppl").click(function(){
+      $.post("character="+characterName+"newPlayerLog="+$("div#playerLog > textarea").val())
+      loading()
+    })
 
 
     reload(30000)
     //reload(60000) --1 minutes
-
 
     </script>
 </body>
