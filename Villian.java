@@ -3,8 +3,8 @@ public class Villian{
     private Admin admin;
 
 
-    public Villian(String charactertype){
-        intansiateCharacter(charactertype);
+    public Villian(String charactertype,String characterName){
+        intansiateCharacter(charactertype,characterName);
     }
 
     public void setAdmin(Admin admin){
@@ -35,19 +35,19 @@ public class Villian{
         this.character.removeItem(item);
     }
 
-    private void intansiateCharacter(String character){
+    private void intansiateCharacter(String character,String characterName){
         switch(character){
-            case "Wizard": this.character = new Wizard("Düşman",null);
+            case "Wizard": this.character = new Wizard(characterName,null);
             break;
-            case "Farmer": this.character = new Farmer("Düşman",null);
+            case "Farmer": this.character = new Farmer(characterName,null);
             break;
-            case "Knight": this.character = new Knight("Düşman",null);
+            case "Knight": this.character = new Knight(characterName,null);
             break;
-            case "BlackSmith": this.character = new BlackSmith("Düşman", null);
+            case "BlackSmith": this.character = new BlackSmith(characterName, null);
             break;
-            case "Barbarian": this.character = new Barbarian("Düşman", null);
+            case "Barbarian": this.character = new Barbarian(characterName, null);
             break;
-            case "Wolfman": this.character = new Wolfman("Düşman",null);
+            case "Wolfman": this.character = new Wolfman(characterName,null);
             break;
             case "Boss": this.character = new Boss();
             break;
@@ -58,14 +58,14 @@ public class Villian{
 
     public void closeAttack(Character target) throws Exception{
         double attackpoints = this.character.attack(true);
-        GameServer.logWriter("Düşman "+attackpoints+" vuruş yaptı.");
+        GameServer.logWriter(this.character.getCharacterName()+" "+attackpoints+" vuruş yaptı.");
         target.defence(attackpoints);
         GameServer.logWriter(target.getCharacterName()+"ın "+target.getHealth()+" canı kaldı.");
     }
 
     public void wideAttack(Character target) throws Exception{
         double attackpoints = this.character.attack(false);
-        GameServer.logWriter("Düşman "+attackpoints+" vuruş yaptı.");
+        GameServer.logWriter(this.character.getCharacterName()+" "+attackpoints+" vuruş yaptı.");
         target.defence(attackpoints);
         GameServer.logWriter(target.getCharacterName()+"ın "+target.getHealth()+" canı kaldı.");
     }

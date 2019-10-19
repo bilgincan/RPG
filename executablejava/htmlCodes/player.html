@@ -156,6 +156,7 @@
     var health;
     var sanity;
     var items;
+    var isWolf;
 
 
     //arrays of items
@@ -165,7 +166,7 @@
     var shoery = [["çarık","+0,5 hız +0,5 savuşturma","",15,"Sandal"],["hafif ayakkabı","+1 hız +1 savuşturma","",30,"LightShoe"],["hafif spor ayakabbı","+1,5 hız +2 savuşturma","",75,"SportShoe"],["hafif zırhlı","+0,2 defans +0,5 hız +1 savuşturma","",50,"LightArmoredShoe"],["orta zırhlı","+0,5 defans +0,2 hız +0,5 savuşturma","",55,"MediumArmoredShoe"],["ağır zırhlı","+1 defans","",60,"HeavyShoe"]]
     var wizardian = [["asa","+1 iyileştirme","",100,"Wand"],["karizmatik gözlük","+1 ikna","",70,"Sunglasses"],["büyücü pelerini","+0,5 iyileştirme +0,5 ikna +0,5 araştırma +0,5 gizlenme","",125,"Cloak"]]
     //for the sake of the server
-    window.history.pushState("oyuncu","Oyuncu","http://localhost:8080/htmlCodes/player.html/current="+characterName)
+    window.history.pushState("oyuncu","Oyuncu","/htmlCodes/player.html/current="+characterName)
 
     characterName = printTurkishLetters(characterName)
     printValues()
@@ -274,30 +275,37 @@
             break
             case "class Barbarian": $("#character_type").append(" barbar")
             break
-            case "class Wolfman": $("#character_type").append(" kurt adam")
+            case "class Wolfman": {
+              $("#character_type").append(" kurt adam")
+              $("#character_type").append("<br><input type='checkbox' id='beWolfHuman'/>Kurt Adama Dönüş")
+              if(isWolf)  $("#beWolfHuman").prop('checked',true);
+              console.log(isWolf)
+            }
             break
         }
 
         for(var i = 0; i < enemies.length; i++){
-            var enemyName = enemies[i][0]
-            switch(enemyName){
-                case "class Knight": $("#enemy_list").append("<li>Şovalye  ")
+            var enemyType = enemies[i][0]
+            var enemyCharacterName = printTurkishLetters(enemies[i][2]);
+            $("#enemy_list").append("<li>"+enemyCharacterName+" ");
+            switch(enemyType){
+                case "class Knight": $("#enemy_list").append("(Şovalye) ")
                 break
-                case "class Wizard": $("#enemy_list").append("<li>Büyücü  ")
+                case "class Wizard": $("#enemy_list").append("(Büyücü)  ")
                 break
-                case "class Farmer": $("#enemy_list").append("<li>Çiftçi  ")
+                case "class Farmer": $("#enemy_list").append("(Çiftçi)  ")
                 break
-                case "class BlackSmith": $("#enemy_list").append("<li>Demirci  ")
+                case "class BlackSmith": $("#enemy_list").append("(Demirci)  ")
                 break
-                case "class Barbarian": $("#enemy_list").append("<li>Barbar  ")
+                case "class Barbarian": $("#enemy_list").append("(Barbar)  ")
                 break
-                case "class Wolfman": $("#enemy_list").append("<li>Kurt adam  ")
+                case "class Wolfman": $("#enemy_list").append("(Kurt adam)  ")
                 break
-                case "class Boss": $("#enemy_list").append("<li>Boss  ")
+                case "class Boss": $("#enemy_list").append("(Boss)  ")
                 break
             }
             var enemyHealth = enemies[i][1]
-            $("#enemy_list").append("HP:"+enemyHealth+"<br><button id='"+enemyName+"' name='closeAttack' class='btn btn-danger'>Yakından saldır</button>&nbsp;<button id='"+enemyName+"' name='wideAttack' class='btn btn-danger'>Uzaktan saldır</button></li>")
+            $("#enemy_list").append("HP:"+enemyHealth+"<br><button id='"+enemyType+"' name='closeAttack' class='btn btn-danger'>Yakından saldır</button>&nbsp;<button id='"+enemyType+"' name='wideAttack' class='btn btn-danger'>Uzaktan saldır</button></li>")
         }
 
         for(var i = 0; i < otherPlayers.length;i++){
@@ -422,6 +430,12 @@
     $("button[name='wideAttack']").click(function(){
       var enemy = $(this).attr('id')
       $.post("wideattack="+enemy+" "+characterName)
+      reload(250)
+    })
+    $("#beWolfHuman").click(function(){
+      var checked = $("#beWolfHuman").is(':checked')
+      if(checked) $.post("beWolf"+characterName);
+      else  $.post("beHuman"+characterName);
       reload(250)
     })
 

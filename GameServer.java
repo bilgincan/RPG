@@ -103,8 +103,10 @@ public class GameServer{
         }
         else if(input.contains("generateEnemy")){
           String[] parts = input.split("generateEnemy=");
-          String enemyType = parts[1].split(" HTTP")[0];
-          this.admin.generateEnemy(enemyType);
+          parts = parts[1].split("name=");
+          String enemyType = parts[0];
+          String characterName = parts[1].split(" HTTP")[0];
+          this.admin.generateEnemy(enemyType,characterName);
         }
         else if(input.contains("abilities=")){
           String parts[] = input.split("abilities=");
@@ -130,6 +132,27 @@ public class GameServer{
           String log = parts[1].split(" HTTP")[0];
           String characterName = parts[0].split("character=")[1];
           writeIntoPlayerLog(log, characterName);
+        }
+        else if (input.contains("beWolf")) {
+          String parts[] = input.split("beWolf");
+          String characterName = parts[1].split(" HTTP")[0];
+          wolfManGoingToBeWolf(characterName);
+        }
+        else if (input.contains("beHuman")) {
+          String parts[] = input.split("beHuman");
+          String characterName = parts[1].split(" HTTP")[0];
+          wolfManGoingToBeHuman(characterName);
+        }else if (input.contains("overwriteEnemyJs=")) {
+          String parts[] = input.split("overwriteEnemyJs=");
+          String enemyName = parts[1].split(" HTTP")[0];
+          try{
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter (new FileOutputStream("htmlCodes/enemy.js", false),"UTF8"));
+            writer.write("var enemy='"+enemyName+"'");
+            writer.flush();
+            writer.close();
+          }catch(IOException e){
+            e.printStackTrace();
+          }
         }
 
         //load html files by names
@@ -224,7 +247,7 @@ public class GameServer{
             jsCode += "var enemies = [";
             for(int i = 0; i < enemies.size(); i++){
                 Character enChar = enemies.get(i).getCharacter();
-                jsCode += "['"+enChar.getClass() +"' , "+enChar.getHealth()+"]";
+                jsCode += "['"+enChar.getClass() +"' , "+enChar.getHealth()+",'"+enChar.getCharacterName()+"']";
                 if(i < enemies.size()-1)
                     jsCode += " , ";
             }
@@ -266,6 +289,7 @@ public class GameServer{
                 }
             }
             jsCode += "];";
+
             printHTMLPage(printPage,jsCode);
         }
     }
@@ -285,6 +309,11 @@ public class GameServer{
               jsCode += ",";
       }
       jsCode += "];";
+      if (charprint instanceof Wolfman) {
+        jsCode += "var isWolf="+((Wolfman) charprint).isWolf()+";";
+      }else{
+        jsCode += "var isWolf= false;";
+      }
       return jsCode;
     }
     private void prepareAdminPage(){
@@ -294,7 +323,7 @@ public class GameServer{
         jsCode += "players.push(new player('"+c.getCharacterName()+"','"+c.getClass()+"','"+p.getPlayerName()+"',"+Arrays.toString(c.getAbilities())+","+c.getMoney()+","+c.getSanity()+","+c.getHealth()+"));";
       }
       for(Villian v:this.admin.getVillians()){
-        jsCode += "villians.push(new villian('"+v.getCharacter().getClass()+"','"+v.getCharacter().getHealth()+"'));";
+        jsCode += "villians.push(new villian('"+v.getCharacter().getClass()+"','"+v.getCharacter().getHealth()+"','"+v.getCharacter().getCharacterName()+"'));";
       }
       printHTMLPage(adminPage, jsCode);
     }
@@ -539,6 +568,24 @@ public class GameServer{
       }
       throw new Exception("aksiyon uygulanırken bir hata meydana geldi");
     }
+    private void wolfManGoingToBeWolf(String characterName){
+      Character character = this.admin.getCharacterByName(characterName);
+      if(character instanceof Wolfman){
+        Wolfman wolfi = (Wolfman) character;
+        wolfi.beWolf();
+      }else{
+        throw new IllegalArgumentException("A non wolfman character tries to be wolf character-class: "+character.getClass().toString());
+      }
+    }
+    private void wolfManGoingToBeHuman(String characterName){
+      Character character = this.admin.getCharacterByName(characterName);
+      if(character instanceof Wolfman){
+        Wolfman wolfi = (Wolfman) character;
+        wolfi.beHuman();
+      }else{
+        throw new IllegalArgumentException("A non wolfman character tries to be human character-class: "+character.getClass().toString());
+      }
+    }
     private void setAbilities(String abilitiesString,String playerName){
       Player  player= this.admin.getPlayerByName(playerName);
       double[] abilities = new double[9];
@@ -668,6 +715,12 @@ public class GameServer{
     }
     if(input.contains("%C3%87")){
       input = input.replace("%C3%87","Ç");
+    }
+    if(input.contains("%C3%B6")){
+      input = input.replace("%C3%B6","ö");
+    }
+    if(input.contains("%C3%96")){
+      input = input.replace("%C3%96","Ö");
     }
     return input;
   }

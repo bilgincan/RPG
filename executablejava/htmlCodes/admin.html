@@ -49,6 +49,7 @@
 </div>
 
   <script src="/htmlCodes/player.js"></script>
+  <script src="/htmlCodes/enemy.js"></script>
   <script src="/htmlCodes/jquery-3.2.1.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script>
@@ -85,7 +86,8 @@
     if(villians.length>0){
       $("#enemies").append("<h4>Düşmanlar:</h4>")
       villians.forEach(function(villian){
-        $("#enemies").append('<ul><li class="enemy">'+villian.characterType+' '+villian.health+' <select id="target" class="mdb-select md-form"><option value="" disabled selected>Hedef Seçiniz</option>'+targetOptionsForEnemy+'</select><button type="button" class="btn btn-danger" id="'+villian.characterType+'" name="attack">Saldır</button><button type="button" class="btn btn-danger" id="'+villian.characterType+'" name="removeEnemy">Düşmanı kaldır</button></li></ul>')
+        var enemyName = printTurkishLetters(villian.characterName)
+        $("#enemies").append('<ul><li class="enemy">'+enemyName+'<button class="btn btn-outline-info btn-small" id="'+enemyName+'" name="stats">Karakterin Güçleri</button> <br />'+villian.characterType+' '+villian.health+' <select id="target" class="mdb-select md-form"><option value="" disabled selected>Hedef Seçiniz</option>'+targetOptionsForEnemy+'</select><button type="button" class="btn btn-danger" id="'+villian.characterType+'" name="attack">Saldır</button><button type="button" class="btn btn-danger" id="'+villian.characterType+'" name="removeEnemy">Düşmanı kaldır</button></li></ul>')
       })
     }
     $(".enemy").css("color","darkblue")
@@ -100,11 +102,9 @@
 
     $("button[name='enemyGenerate']").click(function(){
       var id = $(this).attr("id")
-      var takeAction = window.confirm(id+" türünde karakter düşman olarak oluşturuluyor, onaylıyor musunz?");
-      if(takeAction){
-        $.post("generateEnemy="+id);
+      var enemyName = window.prompt("Lütfen düşmana vermek istediğiniz ismi giriniz.")
+        $.post("generateEnemy="+id+"name="+enemyName);
         reload(250);
-      }
     })
     $("input").css("width","70px")
 
@@ -117,7 +117,6 @@
         while(target.includes("Hedef Seçiniz")){
           target = target.replace("Hedef Seçiniz","");
         }
-        console.log("target: "+target)
         $.post("closeattack="+villian+" "+target+" false")
         reload(250)
       }
@@ -161,6 +160,12 @@
     $("button#updateStory").click(function(){
         $.post("newAdminLog="+$("textarea").val())
         reload(250)
+    })
+    $("button[name='stats']").click(function(){
+      var id = $(this).attr('id')
+      console.log("triggered")
+      $.post("overwriteEnemyJs="+id);
+      window.open("/htmlCodes/enemy.html","","width=350px,height=500px,left=500px")
     })
     reload(60000)
     </script>

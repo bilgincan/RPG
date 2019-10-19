@@ -11,9 +11,10 @@ class player{
 }
 
 class villian{
-    constructor(characterType,health){
+    constructor(characterType,health,characterName){
       this.characterType = characterType;
       this.health = health;
+      this.characterName = characterName;
     }
 }
 function reload(loadtime){
@@ -23,8 +24,7 @@ function reload(loadtime){
 }
 
 function printTurkishLetters(characterName){
-
-//make the turkish letters visiable
+//make the turkish letters visible
 while(characterName.includes("%20")){
   characterName = characterName.replace("%20"," ");
 }
@@ -57,6 +57,12 @@ while(characterName.includes("%C4%9E")){
 }
 while(characterName.includes("%C3%87")){
   characterName = characterName.replace("%C3%87","Ç");
+}
+while(characterName.includes("%C3%B6")){
+  characterName = characterName.replace("%C3%B6","ö")
+}
+while(characterName.includes("%C3%96")){
+  characterName = characterName.replace("%C3%96","Ö")
 }
 return characterName;
 }

@@ -86,8 +86,8 @@ public class Admin{
         return Player.rollDice();
     }
 
-    public void generateEnemy(String type){
-        Villian enemy = new Villian(type);
+    public void generateEnemy(String type,String characterName){
+        Villian enemy = new Villian(type,characterName);
         villians.add(enemy);
         enemy.setAdmin(this);
     }
