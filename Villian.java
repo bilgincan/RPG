@@ -1,4 +1,4 @@
-public class Villian{
+public class Villian implements GeneralPlayer{
     private Character character;
     private Admin admin;
 

@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<link rel="stylesheet" href="/htmlCodes/loading.css">
 </head>
 
 <body>
@@ -43,6 +44,8 @@
     <font size="+0.5">
       <div id="adminLog">
       </div>
+      <div id="loading" class="lds-hourglass">
+      </div>
       <button id='updateStory' class="btn btn-success">Güncelle</button>
     </font>
   </div>
@@ -56,12 +59,12 @@
     $("#log").load('/htmlCodes/log.txt');
     $("#adminLog").load("/htmlCodes/adminLog.txt");
 
+    $("#loading").hide()
     $("#enemyGenerator").css({"position":"absolute","bottom":"10%","left":"35%"})
     $("#enemies").css({"position":"absolute","bottom":"5%","left":"70%"})
     $("#enemyGeneratorTitle").css({"position":"absolute","bottom":"15%","left":"45%"})
     $("#reset").css({"position":"fixed","bottom":"0%","left":"45%"})
     $("#rollDice").css({"position":"fixed","bottom":"5%","left":"46.5%"})
-  // $("#eventsSection").css({"position":"absolute","top":"90%"})
     $("#eventsInStory").css({"position":"absolute","top":"90%","height":"14%","overflow":"scroll","border-style":"inset","border-width":"thick","border-color":"green"})
     $("#eventsInStoryByAdmin").css({"position":"absolute","top":"104%","height":"35%","border-style":"inset","border-width":"thick","border-color":"green"})
     $("button#updateStory").css({"position":"absolute","left":"37%"})
@@ -70,6 +73,7 @@
     var players;
     var villians;
     var targetOptionsForEnemy = "";
+    var autoReload=true;
 
     var i = 0;
     players.forEach(function(player) {
@@ -103,6 +107,7 @@
     $("button[name='enemyGenerate']").click(function(){
       var id = $(this).attr("id")
       var enemyName = window.prompt("Lütfen düşmana vermek istediğiniz ismi giriniz.")
+      while (enemyName == "") window.prompt("Lütfen düşmana vermek istediğiniz ismi giriniz. İsim vermeden devam edemezsiniz.");
         $.post("generateEnemy="+id+"name="+enemyName);
         reload(250);
     })
@@ -159,14 +164,15 @@
     })
     $("button#updateStory").click(function(){
         $.post("newAdminLog="+$("textarea").val())
-        reload(250)
+        loading()
     })
     $("button[name='stats']").click(function(){
       var id = $(this).attr('id')
       console.log("triggered")
       $.post("overwriteEnemyJs="+id);
-      window.open("/htmlCodes/enemy.html","","width=350px,height=500px,left=500px")
+      window.open("/htmlCodes/enemy.html","","width=350px,height=600px,left=500px")
     })
+
     reload(60000)
     </script>
 </body>

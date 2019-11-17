@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Player{
+public class Player implements GeneralPlayer{
     private Character character;
     private String playerName;
     private Admin admin;

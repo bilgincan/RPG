@@ -147,16 +147,20 @@ public class GameServer{
           String enemyName = parts[1].split(" HTTP")[0];
           try{
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter (new FileOutputStream("htmlCodes/enemy.js", false),"UTF8"));
-            writer.write("var enemy='"+enemyName+"'");
+            writer.write("var enemyName='"+enemyName+"';");
             writer.flush();
             writer.close();
           }catch(IOException e){
             e.printStackTrace();
           }
+        }else if (input.contains("getEnemyAbilities=")) {
+          String parts[] = input.split("getEnemyAbilities=");
+          String enemyName = parts[1].split(" HTTP/1.1")[0];
+          sendEnemyAbilitiesToUI(enemyName);
         }
 
         //load html files by names
-        if(input.contains("GET /htmlCodes/") && !input.contains("player.html")){
+        else if(input.contains("GET /htmlCodes/") && !input.contains("player.html")){
                 String[] parts = input.split("/");
                 String file = parts[2];
                 if(file.contains("playerLogs")){
@@ -587,7 +591,10 @@ public class GameServer{
       }
     }
     private void setAbilities(String abilitiesString,String playerName){
-      Player  player= this.admin.getPlayerByName(playerName);
+      //for player use playerName, for villain use characterName
+      GeneralPlayer player= this.admin.getPlayerByName(playerName);
+      if(player == null) player = this.admin.getVillianByCharacterName(playerName);
+
       double[] abilities = new double[9];
       String number = "";
       int j = 0;
@@ -629,6 +636,29 @@ public class GameServer{
       }
       this.admin.setAbilities(abilities, player);
     }
+    private void sendEnemyAbilitiesToUI(String name){
+      System.out.println(name);
+      Character villian = this.admin.getVillianCharacterByName(name);
+      int health = villian.getHealth();
+      double abilities[] = villian.getEffectiveAbilities();
+      try{
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter (new FileOutputStream("htmlCodes/enemy.js", true),"UTF8"));
+        String jsCode = "var enemy=new villian('"+villian.getClass()+"',"+health+",'"+name+"');";
+        jsCode += "var enemyAbilities= [";
+        for(int i = 0; i < abilities.length; i++){
+          jsCode += abilities[i];
+          if(i < abilities.length-1)
+            jsCode += ",";
+        }
+        jsCode += "];";
+        writer.write(jsCode);
+        writer.flush();
+        writer.close();
+      }catch(IOException e){
+        e.printStackTrace();
+      }
+    }
+
     private void alert(){
         alert("Lütfen karakterin tipi seçiniz, karakterin ismini yazınız ve kendi isminizi yazınız. Not: karakterinin ismi başka bir karakterle aynı ismi taşıyorsa da bu mesajı alıyor olabilirsin.");
     }

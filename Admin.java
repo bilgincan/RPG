@@ -32,7 +32,13 @@ public class Admin{
         }
         return null;
     }
-
+    public Villian getVillianByCharacterName(String characterName){
+      for(Villian v: this.villians){
+        if(v.getCharacter().getCharacterName().equals(characterName))
+          return v;
+      }
+      return null;
+    }
     public Villian getVillianByClass(String name){
       for(Villian v: this.villians){
             if(v.getCharacter().getClass().toString().equals("class "+name))
@@ -42,12 +48,17 @@ public class Admin{
     }
     public Character getCharacterByName(String name){
         for(Player p: this.players){
-            // System.out.println(p.getCharacter().getCharacterName());
-            // System.out.println(name);
             if(p.getCharacter().getCharacterName().equals(name))
                 return p.getCharacter();
         }
         return null;
+    }
+    public Character getVillianCharacterByName(String name){
+      for(Villian v: this.villians){
+        if(v.getCharacter().getCharacterName().equals(name))
+          return v.getCharacter();
+      }
+      return null;
     }
 
     public void giveMoney(int plusMoney,Player player){
@@ -55,30 +66,30 @@ public class Admin{
         a.setMoney(a.getMoney()+plusMoney);
     }
 
-    public void giveHealth(int plusHealth, Player player){
+    public void giveHealth(int plusHealth, GeneralPlayer player){
         Character a = player.getCharacter();
         a.setHealth(a.getHealth()+plusHealth);
     }
 
-    public void giveSanity(int plusSanity, Player player){
+    public void giveSanity(int plusSanity, GeneralPlayer player){
         Character a = player.getCharacter();
         a.setSanity(a.getSanity()+plusSanity);
     }
 
-    public void setMoney(int money, Player player){
+    public void setMoney(int money, GeneralPlayer player){
       Character a = player.getCharacter();
       a.setMoney(money);
     }
-    public void setHealth(int health,Player player){
+    public void setHealth(int health,GeneralPlayer player){
       Character a = player.getCharacter();
       a.setHealth(health);
     }
-    public void setSanity(int sanity,Player player){
+    public void setSanity(int sanity,GeneralPlayer player){
       Character a = player.getCharacter();
       a.setSanity(sanity);
     }
 
-    public void setAbilities(double[] abilities, Player player){
+    public void setAbilities(double[] abilities, GeneralPlayer player){
         player.getCharacter().setAbilities(abilities);
     }
 

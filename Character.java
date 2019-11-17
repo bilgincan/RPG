@@ -90,7 +90,9 @@ public abstract class Character{
     }
 
     public void setAbilities(double[] ab){
+        System.out.println("SetAbilities: \n");
         for(int i = 0; i < ab.length; i++){
+          System.out.println(ab[i]);
             this.effectiveAbilities[i] = ab[i];
         }
     }
