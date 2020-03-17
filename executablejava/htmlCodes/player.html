@@ -54,7 +54,8 @@
         <ol id=8><button id="heal" name="command" type="button" class="btn btn-secondary">Tedavi et</button>tedavi etme:</ol>
     </font>
     </ul>
-      <button type="button" class="btn btn-primary btn-lg" id="rollDiceButton">Zar At!</button>
+      <button type="button" class="btn btn-primary btn-lg" id="rollDiceButton">Zar At!</button> <br />
+      <button type="button" class="btn btn-secondary btn-lg" id="fateDice">Fudge Dice Roller</button>
     </div>
     <div id="eventsSection">
     <div class="logs">
@@ -222,6 +223,9 @@
       var id = $(this).attr('id');
       $.post("rollDice"+characterName)
       reload(250)
+    })
+    $("#fateDice").click(function(){
+      window.open("/htmlCodes/Web Build/index.html")
     })
 
     //set the health bar

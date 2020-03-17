@@ -42,7 +42,7 @@ public class GameServer{
             String input = in.readLine();
             System.out.println(input);
             if(input.equals("GET / HTTP/1.1")){
-            printHTMLPage(homePage);
+            sendText(homePage);
         }
         if(input.contains("Admin")){
           if(this.admin == null)
@@ -165,13 +165,17 @@ public class GameServer{
                 String file = parts[2];
                 if(file.contains("playerLogs")){
                   String characterLog = parts[3].split(" HTTP")[0];
-                  printHTMLPage("htmlCodes/playerLogs/"+characterLog);
+                  sendText("htmlCodes/playerLogs/"+characterLog);
                   return;
                 }
-                parts = file.split(" ");
-                file = "htmlCodes/";
-                file += parts[0];
-                printHTMLPage(file);
+
+                parts = input.split(" HTT");
+                file = parts[0].split("GET /")[1];
+                file = writeMissingTurkishChars(file);
+                if(file.contains(".png") || file.contains(".jpg") || file.contains(".jpeg") || file.contains(".unityweb") || file.contains(".ico")){
+                  sendByte(file);
+                }
+                else sendText(file);
             }
             //write character abilities in the html file
             if(input.contains("current=")){
@@ -205,7 +209,7 @@ public class GameServer{
                     createLogFileForPlayer(characterName);
                 }
                 else{
-                    printHTMLPage(homePage);
+                    sendText(homePage);
                     alert();
                 }
             }
@@ -215,7 +219,7 @@ public class GameServer{
             e.printStackTrace();
         }catch(Exception e){
             e.printStackTrace();
-            printHTMLPage(homePage);
+            sendText(homePage);
             alert();
         }
         }
@@ -294,7 +298,7 @@ public class GameServer{
             }
             jsCode += "];";
 
-            printHTMLPage(printPage,jsCode);
+            sendText(printPage,jsCode);
         }
     }
     private String renderAbilitiesIntoJsCode(Player player){
@@ -329,10 +333,10 @@ public class GameServer{
       for(Villian v:this.admin.getVillians()){
         jsCode += "villians.push(new villian('"+v.getCharacter().getClass()+"','"+v.getCharacter().getHealth()+"','"+v.getCharacter().getCharacterName()+"'));";
       }
-      printHTMLPage(adminPage, jsCode);
+      sendText(adminPage, jsCode);
     }
     //for printing javascript datas with html
-    private void printHTMLPage(String page,String jsCodes){
+    private void sendText(String page,String jsCodes){
         try{
         PrintStream out = new PrintStream(socket.getOutputStream());
         BufferedReader htmlCode = new BufferedReader(new InputStreamReader(new FileInputStream(page),"UTF8"));
@@ -368,7 +372,7 @@ public class GameServer{
 
     }
 
-    private void printHTMLPage(String page){
+    private void sendText(String page){
         try{
 
         PrintStream out = new PrintStream(socket.getOutputStream());
@@ -384,13 +388,56 @@ public class GameServer{
 
         htmlCode.close();
 
-        out.println("HTTP/1.1 200 OK\nContent-Type: text/html\n\r\n");
+        out.println("HTTP/1.1 200 OK");
+
+         if(page.contains(".css")){
+          out.println("Content-Type: text/css\n\r\n");
+        }
+        else if(page.contains(".json")){
+          out.println("Content-Type: application/json\n\r\n");
+        }
+        else if(page.contains(".xml")){
+          out.println("Content-Type: */*+xml\n\r\n");
+        }
+        else if(page.contains(".js")){
+          out.println("Content-Type: text/javascript\n\r\n");
+        }
+        else if(page.contains(".html")){
+          out.println("Content-Type: text/html\n\r\n");
+        }
+        else{
+          out.println("Content-Type: text/plain\n\r\n");
+        }
         out.println(content);
         out.flush();
     }catch(Exception e){
         e.printStackTrace();
     }
 }
+
+    private void sendByte(String fileName){
+      try{
+        File file = new File(fileName);
+    FileInputStream fis = new FileInputStream(file);
+    byte[] data = new byte[(int) file.length()];
+    fis.read(data);
+    fis.close();
+
+    DataOutputStream binaryOut = new DataOutputStream(socket.getOutputStream());
+    binaryOut.writeBytes("HTTP/1.0 200 OK\r\n");
+
+    if(fileName.contains(".png")) binaryOut.writeBytes("Content-Type: image/png\r\n");
+    else if(fileName.contains(".jpg") || fileName.contains(".jpeg")) binaryOut.writeBytes("Content-Type: image/jpeg\r\n");
+    else if(fileName.contains(".unityweb")) binaryOut.writeBytes("Content-Type: application/octet-stream\r\nContent-Encoding: gzip\r\n");
+    binaryOut.writeBytes("Content-Length: " + data.length);
+    binaryOut.writeBytes("\r\n\r\n");
+    binaryOut.write(data);
+
+    binaryOut.close();
+  }catch(Exception e){
+    System.out.println(e);
+  }
+    }
 
     private void buyItem(String itemName){
         String[] orderQuery = getItemAndCharacterFromQuery(itemName);
@@ -402,11 +449,11 @@ public class GameServer{
             Character character = admin.getCharacterByName(characterName);
 
             if(character.purchase(item)){
-                printHTMLPage(player_page);
+                sendText(player_page);
                 alert("Eşya alma işlemi başarılı, hayırlı olsun");
             }
             else{
-                printHTMLPage(player_page);
+                sendText(player_page);
                 alert("Maalesef eşyayı alamadın, fakir puşt.");
             }
 
@@ -637,7 +684,6 @@ public class GameServer{
       this.admin.setAbilities(abilities, player);
     }
     private void sendEnemyAbilitiesToUI(String name){
-      System.out.println(name);
       Character villian = this.admin.getVillianCharacterByName(name);
       int health = villian.getHealth();
       double abilities[] = villian.getEffectiveAbilities();
