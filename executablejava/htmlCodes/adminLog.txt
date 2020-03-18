@@ -1,1 +1,0 @@
-<textarea rows='10'>bir şey bir şey</textarea>

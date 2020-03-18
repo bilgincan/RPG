@@ -1,8 +1,0 @@
-<br>
->Düşman saldırıyı savuşturdu, çatışmadan hasar almadan çıktı.<br>
->Düşmanın 120 canı kaldı.<br>
->c 36.0 vuruş yaptı<br>
->Düşman saldırıyı savuşturdu, çatışmadan hasar almadan çıktı.<br>
->Düşmanın 120 canı kaldı.<br>
->c 102.0 vuruş yaptı<br>
->Düşmanın 18 canı kaldı.
